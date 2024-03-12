@@ -12,33 +12,35 @@ import (
 
 func CreateFace(c *gin.Context) {
 	face := model.Face{}
-	json_format := struct {
+	jsonFormat := struct {
 		FaceId   string `json:"face_id"`
 		Name     string `json:"name"`
 		FaceImg  string `json:"face_Img"`
 		FaceTime string `json:"face_Time"`
 	}{}
-	if ok := util.ParseBody(c, &json_format); !ok {
+	if ok := util.ParseBody(c, &jsonFormat); !ok {
 		fmt.Println("111")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": http.StatusBadRequest,
 			"err":  "传入json的格式不正确或者字段为空",
 		})
 	}
-	parseUint, err2 := strconv.ParseUint(json_format.FaceId, 0, 0)
+	fmt.Printf("接受到的%#v", jsonFormat)
+	parseUint, err2 := strconv.ParseUint(jsonFormat.FaceId, 0, 0)
 	if err2 != nil {
 		fmt.Println("Error parsing id:", err2)
 		return
 	}
-	face.ID = uint(parseUint)
-	face.Name = json_format.Name
-	face.FaceImg = json_format.FaceImg
-	t, err := time.Parse("2006-01-02 15:04:05", json_format.FaceTime)
+	face.FaceId = uint(parseUint)
+	face.Name = jsonFormat.Name
+	face.FaceImg = jsonFormat.FaceImg
+	t, err := time.Parse("2006-01-02 15:04:05", jsonFormat.FaceTime)
 	if err != nil {
 		fmt.Println("Error parsing time:", err)
 		return
 	}
-	face.FaceTime = t
+	face.FaceTime = t.Add(-8 * time.Hour)
+	fmt.Println("face格式化之后： ", face)
 	ok := model.CreateFace(&face)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{

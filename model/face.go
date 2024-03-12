@@ -10,16 +10,16 @@ import (
 
 type Face struct {
 	gorm.Model
-	FaceId   int       `gorm:"column:faceId;type:int unsigned;not null"`
+	FaceId   uint      `gorm:"column:faceId;type:int unsigned;not null"`
 	Name     string    `gorm:"column:name;type:varchar(50);not null"`
 	FaceImg  string    `gorm:"column:faceImg;type:LONGTEXT;not null"`
 	FaceTime time.Time `gorm:"column:faceTime;not null"`
 }
 
 func CreateFace(face *Face) bool {
-	if config.DB.NewRecord(face) {
-		return false
-	}
+	//if config.DB.NewRecord(face) {
+	//	return false
+	//}
 	create := config.DB.Create(face)
 	if create.Error != nil {
 		fmt.Println(create.Error)
