@@ -33,10 +33,10 @@ func TestFaceCreate(t *testing.T) {
 	base64str := base64.StdEncoding.EncodeToString(data)
 
 	requestBody, err := json.Marshal(map[string]string{
-		"face_id":   "1",
-		"name":      "阿牛",
+		"face_id":   "4",
+		"name":      "阿牛4",
 		"face_Img":  base64str,
-		"face_Time": "2024-03-11 16:12:41",
+		"face_Time": "2024-03-12 14:12:41",
 	})
 	if err != nil {
 		t.Error("构造json格式错误")

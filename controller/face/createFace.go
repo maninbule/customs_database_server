@@ -1,4 +1,4 @@
-package controller
+package face
 
 import (
 	"fmt"
@@ -15,11 +15,10 @@ func CreateFace(c *gin.Context) {
 	jsonFormat := struct {
 		FaceId   string `json:"face_id"`
 		Name     string `json:"name"`
-		FaceImg  string `json:"face_Img"`
 		FaceTime string `json:"face_Time"`
+		FaceImg  string `json:"face_Img"`
 	}{}
 	if ok := util.ParseBody(c, &jsonFormat); !ok {
-		fmt.Println("111")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": http.StatusBadRequest,
 			"err":  "传入json的格式不正确或者字段为空",

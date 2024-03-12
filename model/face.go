@@ -12,8 +12,8 @@ type Face struct {
 	gorm.Model
 	FaceId   uint      `gorm:"column:faceId;type:int unsigned;not null"`
 	Name     string    `gorm:"column:name;type:varchar(50);not null"`
-	FaceImg  string    `gorm:"column:faceImg;type:LONGTEXT;not null"`
 	FaceTime time.Time `gorm:"column:faceTime;not null"`
+	FaceImg  string    `gorm:"column:faceImg;type:LONGTEXT;not null"`
 }
 
 func CreateFace(face *Face) bool {
@@ -53,4 +53,22 @@ func GetFaceByID(id int) Face {
 		panic("sql执行错误[根据id查询人脸失败]")
 	}
 	return face
+}
+
+func GetFaceByLR(l, r int64) []Face {
+	allFace := make([]Face, 0)
+	query := config.DB.Model(&Face{}).Offset(l - 1).Limit(r - l + 1).Find(&allFace)
+	if query.Error != nil {
+		panic("sql执行错误[根据id区间查询人脸失败]")
+	}
+	return allFace
+}
+
+func GetCount() int64 {
+	var cnt int64
+	query := config.DB.Model(&Face{}).Count(&cnt)
+	if query.Error != nil {
+		panic("sql执行错误[查询count失败]")
+	}
+	return cnt
 }
