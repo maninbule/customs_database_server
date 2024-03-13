@@ -1,4 +1,4 @@
-package model
+package modelAttr
 
 import (
 	"fmt"

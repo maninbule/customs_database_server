@@ -2,7 +2,7 @@ package face
 
 import (
 	"fmt"
-	"github.com/customs_database_server/model"
+	"github.com/customs_database_server/model/modelFace"
 	"github.com/customs_database_server/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -10,37 +10,64 @@ import (
 	"time"
 )
 
+type reuestFormat struct {
+	FaceId         string `json:"face_id"`
+	Name           string `json:"name"`
+	FaceTime       string `json:"face_Time"`
+	FaceImgCorrect string `json:"face_Img_correct"`
+	FaceImgPredict string `json:"face_Img_predict"`
+	CameraID       string `json:"camera_id"`
+}
+
+func (r reuestFormat) Valid() bool {
+	keys := []string{
+		r.FaceId, r.Name, r.FaceTime, r.FaceImgCorrect, r.FaceImgPredict, r.CameraID,
+	}
+	for _, key := range keys {
+		if len(key) == 0 {
+			return false
+		}
+	}
+	if _, err := r.getTime(); err != nil {
+		return false
+	}
+	if _, err := r.getId(); err != nil {
+		return false
+	}
+	return true
+}
+
+func (r reuestFormat) getId() (uint, error) {
+	parseUint, err := strconv.ParseUint(r.FaceId, 0, 0)
+	return uint(parseUint), err
+}
+
+func (r reuestFormat) getTime() (time.Time, error) {
+	t, err := time.Parse("2006-01-02 15:04:05", r.FaceTime)
+	return t, err
+}
+
 func CreateFace(c *gin.Context) {
-	face := model.Face{}
-	jsonFormat := struct {
-		FaceId   string `json:"face_id"`
-		Name     string `json:"name"`
-		FaceTime string `json:"face_Time"`
-		FaceImg  string `json:"face_Img"`
-	}{}
-	if ok := util.ParseBody(c, &jsonFormat); !ok {
+	face := modelFace.Face{}
+	jsonFormat := reuestFormat{}
+	if ok := util.ParseBody(c, &jsonFormat); !ok || !jsonFormat.Valid() {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": http.StatusBadRequest,
 			"err":  "传入json的格式不正确或者字段为空",
 		})
-	}
-	fmt.Printf("接受到的%#v", jsonFormat)
-	parseUint, err2 := strconv.ParseUint(jsonFormat.FaceId, 0, 0)
-	if err2 != nil {
-		fmt.Println("Error parsing id:", err2)
 		return
 	}
-	face.FaceId = uint(parseUint)
-	face.Name = jsonFormat.Name
-	face.FaceImg = jsonFormat.FaceImg
-	t, err := time.Parse("2006-01-02 15:04:05", jsonFormat.FaceTime)
-	if err != nil {
-		fmt.Println("Error parsing time:", err)
-		return
-	}
-	face.FaceTime = t.Add(-8 * time.Hour)
+	id, _ := jsonFormat.getId()
+	face.FaceId = &id
+	face.Name = &jsonFormat.Name
+	face.FaceImgCorrect = &jsonFormat.FaceImgCorrect
+	face.FaceImgPredict = &jsonFormat.FaceImgPredict
+	face.CameraID = &jsonFormat.CameraID
+	t, _ := jsonFormat.getTime()
+	addTime := t.Add(-8 * time.Hour)
+	face.FaceTime = &addTime
 	fmt.Println("face格式化之后： ", face)
-	ok := model.CreateFace(&face)
+	ok := modelFace.CreateFace(&face)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": http.StatusOK,

@@ -1,13 +1,13 @@
 package face
 
 import (
-	"github.com/customs_database_server/model"
+	"github.com/customs_database_server/model/modelFace"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func QueryAllFace(c *gin.Context) {
-	allFace := model.GetAllFace()
+	allFace := modelFace.GetAllFace()
 	if allFace == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": http.StatusInternalServerError,

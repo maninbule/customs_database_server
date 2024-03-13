@@ -13,6 +13,7 @@ func InitRouter() *gin.Engine {
 	router.GET("/allFace", face.QueryAllFace)
 	router.GET("/face/:startTime/:endTime", face.QueryFaceByTime)
 	router.GET("/facepage/:left/:right", face.QueryFaceByLimit)
+	router.POST("/face_query", face.QueryFaceByCondition)
 
 	fmt.Println("server on port:8082.....")
 

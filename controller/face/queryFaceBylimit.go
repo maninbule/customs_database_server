@@ -1,7 +1,7 @@
 package face
 
 import (
-	"github.com/customs_database_server/model"
+	"github.com/customs_database_server/model/modelFace"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -13,7 +13,7 @@ func QueryFaceByLimit(c *gin.Context) {
 	right := c.Param("right")
 	l, err1 := strconv.ParseInt(left, 0, 0)
 	r, err2 := strconv.ParseInt(right, 0, 0)
-	total := model.GetCount()
+	total := modelFace.GetCount()
 	if err1 != nil || err2 != nil || l > r || l < 1 || r > total {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": http.StatusBadRequest,
@@ -21,7 +21,7 @@ func QueryFaceByLimit(c *gin.Context) {
 		})
 		return
 	}
-	allFace := model.GetFaceByLR(l, r)
+	allFace := modelFace.GetFaceByLR(l, r)
 	if allFace == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": http.StatusInternalServerError,

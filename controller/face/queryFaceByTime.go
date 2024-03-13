@@ -2,7 +2,7 @@ package face
 
 import (
 	"fmt"
-	"github.com/customs_database_server/model"
+	"github.com/customs_database_server/model/modelFace"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -22,7 +22,7 @@ func QueryFaceByTime(c *gin.Context) {
 		})
 	}
 
-	allFace := model.GetFaceByTime(start, end)
+	allFace := modelFace.GetFaceByTime(start, end)
 	if allFace == nil {
 		fmt.Println("model.GetFaceByTime err")
 		c.JSON(http.StatusInternalServerError, gin.H{
