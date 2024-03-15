@@ -33,7 +33,7 @@ func QueryFaceByTime(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"code":        http.StatusOK,
-		"data-lenght": len(allFace),
+		"data-length": len(allFace),
 		"data":        allFace,
 	})
 }
