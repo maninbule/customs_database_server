@@ -14,8 +14,8 @@ type Face struct {
 	Name           *string    `gorm:"column:name;type:varchar(50);not null;omitempty"`
 	FaceTime       *time.Time `gorm:"column:faceTime;not null;omitempty"`
 	CameraID       *string    `gorm:"column:cameraID;not null;omitempty"`
-	FaceImgCorrect *string    `gorm:"column:faceImgCorrect;type:LONGTEXT;not null;omitempty"`
-	FaceImgPredict *string    `gorm:"column:faceImgPredict;type:LONGTEXT;not null;omitempty"`
+	FaceImgCorrect *string    `gorm:"column:faceImgCorrect;type:varchar(255);not null;omitempty"`
+	FaceImgPredict *string    `gorm:"column:faceImgPredict;type:varchar(255);not null;omitempty"`
 }
 
 func CreateFace(face *Face) bool {

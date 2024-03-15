@@ -9,14 +9,16 @@ import (
 func InitRouter() *gin.Engine {
 	router := gin.Default()
 
-	router.POST("/save_face", face.CreateFace)
+	router.POST("/save_face", face.SaveFaceCompare)
 	router.GET("/allFace", face.QueryAllFace)
 	router.GET("/face/:startTime/:endTime", face.QueryFaceByTime)
 	router.GET("/facepage/:left/:right", face.QueryFaceByLimit)
 	router.POST("/face_query", face.QueryFaceByCondition)
 
-	fmt.Println("server on port:8082.....")
+	// 文件服务器，文件全部存储在static目录
+	router.Static("/face_img/", "static")
 
+	fmt.Println("server on port:8082.....")
 	router.Run(":8082")
 	return router
 }

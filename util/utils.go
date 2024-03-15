@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"mime/multipart"
+	"os"
 	"strconv"
 	"time"
 )
@@ -38,4 +41,18 @@ func ParseInt(intStr string) (int64, error) {
 		return 0, errors.New("int转换错误")
 	}
 	return result, nil
+}
+
+func SaveFile(c *gin.Context, file *multipart.FileHeader) (string, error) {
+	prefix := "static"
+	middlePath := "/img/" + time.Now().Format("2006_01_02")
+	suffix := uuid.New().String() + file.Filename
+	savePath := prefix + middlePath + "/" + suffix
+	urlPath := "/face_img" + middlePath + "/" + suffix
+	err2 := os.MkdirAll(prefix+middlePath, 0666)
+	if err2 != nil {
+		return "", err2
+	}
+	err := c.SaveUploadedFile(file, savePath)
+	return urlPath, err
 }

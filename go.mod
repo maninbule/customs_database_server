@@ -4,7 +4,7 @@ go 1.21.0
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/gorilla/mux v1.8.1
+	github.com/google/uuid v1.6.0
 	github.com/jinzhu/gorm v1.9.16
 )
 
