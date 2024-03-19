@@ -53,20 +53,20 @@ func (r reuestFormat) getTime() (time.Time, error) {
 func SaveFaceCompare(c *gin.Context) {
 	err := c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
-		response.ResponseBadRequest(c)
+		response.ResponseBadRequest(c, "post数据过大")
 		return
 	}
 	fileCorrectImg, ok1 := c.FormFile("face_Img_correct")
 	filePredictImg, ok2 := c.FormFile("face_Img_predict")
 	if ok1 != nil || ok2 != nil {
-		response.ResponseBadRequest(c)
+		response.ResponseBadRequest(c, "缺少人脸图像字段")
 		return
 	}
-	pathCorrectImg, err1 := util.SaveFile(c, fileCorrectImg)
-	pathPredictImg, err2 := util.SaveFile(c, filePredictImg)
+	pathCorrectImg, err1 := util.SaveFileRecResult(c, fileCorrectImg)
+	pathPredictImg, err2 := util.SaveFileRecResult(c, filePredictImg)
 	if err1 != nil || err2 != nil {
 		fmt.Println("存储图片错误, ", err1, err2)
-		response.ResponseBadRequest(c)
+		response.ResponseBadRequest(c, "存储图片错误")
 		return
 	}
 	var jsonFormat reuestFormat
@@ -77,7 +77,7 @@ func SaveFaceCompare(c *gin.Context) {
 	jsonFormat.FaceImgCorrect = pathCorrectImg
 	jsonFormat.FaceImgPredict = pathPredictImg
 	if !jsonFormat.Valid() {
-		response.ResponseBadRequest(c)
+		response.ResponseBadRequest(c, "传输数据不完整")
 		return
 	}
 	err = CreateFace(c, &jsonFormat)

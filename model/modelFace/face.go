@@ -19,7 +19,7 @@ type Face struct {
 }
 
 func CreateFace(face *Face) bool {
-	//if config.DB.NewRecord(face) {
+	//if config.DB.NewRecord(faceImgDataBase) {
 	//	return false
 	//}
 	create := config.DB.Create(face)

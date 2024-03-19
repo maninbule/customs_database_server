@@ -9,13 +9,13 @@ import (
 
 type Attribute struct {
 	gorm.Model
-	AttrID   uint      `gorm:"column:attrId;type:int unsigned;not null"`
-	Name     string    `gorm:"column:name;type:varchar(50);"`
-	Hat      bool      `gorm:"column:hat;type:TINYINT(1);not null"`
-	Glasses  bool      `gorm:"column:glasses;type:TINYINT(1);not null"`
-	Mask     bool      `gorm:"column:mask;type:TINYINT(1);not null"`
-	FaceTime time.Time `gorm:"column:faceTime;not null"`
-	FaceImg  string    `gorm:"column:faceImg;type:LONGTEXT;not null"`
+	AttrID   *uint      `gorm:"column:attrId;type:int unsigned;not null"`
+	Name     *string    `gorm:"column:name;type:varchar(50);"`
+	Hat      *bool      `gorm:"column:hat;type:TINYINT(1);not null"`
+	Glasses  *bool      `gorm:"column:glasses;type:TINYINT(1);not null"`
+	Mask     *bool      `gorm:"column:mask;type:TINYINT(1);not null"`
+	FaceTime *time.Time `gorm:"column:faceTime;not null"`
+	FaceImg  *string    `gorm:"column:faceImg;type:LONGTEXT;not null"`
 }
 
 func CreateAttr(attr *Attribute) bool {

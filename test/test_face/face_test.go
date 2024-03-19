@@ -20,7 +20,7 @@ import (
 
 func TestFaceCreate(t *testing.T) {
 	// 打开文件，并获取文件对应的base64编码
-	file, err := os.OpenFile("face.jpg", os.O_RDONLY, 0666)
+	file, err := os.OpenFile("faceImgDataBase.jpg", os.O_RDONLY, 0666)
 	if err != nil {
 		t.Error("图片打开失败")
 		return
