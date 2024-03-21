@@ -69,3 +69,17 @@ func SaveFileFaceDataBase(c *gin.Context, file *multipart.FileHeader) (string, e
 	err := c.SaveUploadedFile(file, savePath)
 	return urlPath, err
 }
+
+func SaveFileGaitDataBase(c *gin.Context, file *multipart.FileHeader) (string, error) {
+	prefix := "static"
+	middlePath := "/GaitImgDataBase/" + time.Now().Format("2006_01_02")
+	suffix := uuid.New().String() + file.Filename
+	savePath := prefix + middlePath + "/" + suffix
+	urlPath := "/face_img" + middlePath + "/" + suffix
+	err2 := os.MkdirAll(prefix+middlePath, 0666)
+	if err2 != nil {
+		return "", err2
+	}
+	err := c.SaveUploadedFile(file, savePath)
+	return urlPath, err
+}

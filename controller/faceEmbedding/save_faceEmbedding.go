@@ -76,7 +76,7 @@ func saveToDB(c *gin.Context, format *requestFormat) error {
 	faceEmbedding.FaceId = &id
 	faceEmbedding.Name = &format.Name
 	faceEmbedding.Embedding = &format.Embedding
-	faceEmbedding.FaceImg = &format.FaceImg
+	faceEmbedding.FaceImgURL = &format.FaceImg
 
 	if ok := modelFaceEemdding.CreateFace(&faceEmbedding); !ok {
 		response.ResponseBadRequest(c, "数据库存储错误")

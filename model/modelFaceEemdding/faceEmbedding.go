@@ -8,10 +8,10 @@ import (
 
 type FaceEmbedding struct {
 	gorm.Model
-	FaceId    *uint   `gorm:"column:faceId;type:int unsigned;not null;omitempty"`
-	Name      *string `gorm:"column:name;type:varchar(50);not null;omitempty"`
-	Embedding *string `gorm:"column:embedding;type:LONGTEXT;not null;omitempty"`
-	FaceImg   *string `gorm:"column:face_img;type:varchar(255);not null;omitempty"`
+	FaceId     *uint   `gorm:"column:faceId;type:int unsigned;not null;omitempty" json:"face_id"`
+	Name       *string `gorm:"column:name;type:varchar(50);not null;omitempty" json:"name"`
+	Embedding  *string `gorm:"column:embedding;type:LONGTEXT;not null;omitempty" json:"embedding"`
+	FaceImgURL *string `gorm:"column:face_img_url;type:varchar(255);not null;omitempty" json:"faceImgURL"`
 }
 
 func CreateFace(face *FaceEmbedding) bool {

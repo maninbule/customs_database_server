@@ -1,4 +1,4 @@
-package face
+package faceResult
 
 import (
 	"github.com/customs_database_server/model/modelFace"
