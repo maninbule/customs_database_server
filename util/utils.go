@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"io"
 	"mime/multipart"
 	"os"
 	"strconv"
@@ -55,6 +56,36 @@ func SaveFileRecResult(c *gin.Context, file *multipart.FileHeader) (string, erro
 	}
 	err := c.SaveUploadedFile(file, savePath)
 	return urlPath, err
+}
+
+func StringToTime(t string) (*time.Time, error) {
+	res, err := time.Parse("2006-01-02 15:04:05", t)
+	if err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func SaveFileFaceDataBaseFromByte(data []byte, fileName string) (string, error) {
+	prefix := "static"
+	middlePath := "/faceImgDataBase/" + time.Now().Format("2006_01_02")
+	suffix := uuid.New().String() + fileName
+	savePath := prefix + middlePath + "/" + suffix
+	urlPath := "/face_img" + middlePath + "/" + suffix
+	err2 := os.MkdirAll(prefix+middlePath, 0666)
+	if err2 != nil {
+		return "", err2
+	}
+	openFile, err2 := os.OpenFile(savePath, os.O_CREATE|os.O_WRONLY, 0666)
+	for len(data) > 0 {
+		n, err2 := openFile.Write(data)
+		if err2 == io.EOF {
+			break
+		}
+		fmt.Println(n, len(data))
+		data = data[n:]
+	}
+	return urlPath, nil
 }
 func SaveFileFaceDataBase(c *gin.Context, file *multipart.FileHeader) (string, error) {
 	prefix := "static"

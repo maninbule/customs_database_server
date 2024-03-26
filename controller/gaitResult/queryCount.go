@@ -2,11 +2,11 @@ package gaitResult
 
 import (
 	"github.com/customs_database_server/controller/response"
-	"github.com/customs_database_server/model/modelGait"
+	mysqlGaitResult "github.com/customs_database_server/dao/mysql/GaitResult"
 	"github.com/gin-gonic/gin"
 )
 
 func Getcount(c *gin.Context) {
-	count := modelGait.GaitCount()
+	count := mysqlGaitResult.GaitCount()
 	response.ResponseOKWithData(c, count)
 }

@@ -3,10 +3,10 @@ package faceEmbedding
 import (
 	"errors"
 	"github.com/customs_database_server/controller/response"
+	mysqlFaceEmbedding "github.com/customs_database_server/dao/mysql/FaceEmbedding"
 	"github.com/customs_database_server/model/modelFaceEemdding"
 	"github.com/customs_database_server/util"
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"os"
 	"strconv"
 )
@@ -41,17 +41,17 @@ func (r requestFormat) GetFaceId() (uint, error) {
 func SaveFaceEmbedding(c *gin.Context) {
 	err := c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
-		response.ResponseBadRequest(c, "post数据量过大")
+		response.ResponseErr(c, response.CodeErrReQuestTooLarge)
 		return
 	}
 	faceImg, err := c.FormFile("face_img")
 	if err != nil {
-		response.ResponseBadRequest(c, "传输的数据不存在对应face_img的文件")
+		response.ResponseErrWithMsg(c, response.CodeErrRequestParamNotExisted, "传输的数据不存在对应face_img的文件")
 		return
 	}
 	path, err := util.SaveFileFaceDataBase(c, faceImg)
 	if err != nil {
-		response.ResponseBadRequest(c, "图像存储到本地磁盘错误")
+		response.ResponseErr(c, response.CodeErrDataBase)
 		return
 	}
 	var format requestFormat
@@ -59,18 +59,21 @@ func SaveFaceEmbedding(c *gin.Context) {
 	format.Name = c.PostForm("name")
 	format.Embedding = c.PostForm("embedding")
 	format.FaceImg = path
-	err = saveToDB(c, &format)
+	err = saveToDB(&format)
 	if err != nil {
-		response.ResponseBadRequest(c, "数据库存储错误")
+		response.ResponseErr(c, response.CodeErrDataBase)
 		err := os.Remove(path)
 		if err != nil {
+			response.ResponseErr(c, response.CodeErrDataBase)
 			return
 		}
 		return
+	} else {
+		response.ResponseOK(c)
 	}
 }
 
-func saveToDB(c *gin.Context, format *requestFormat) error {
+func saveToDB(format *requestFormat) error {
 	var faceEmbedding modelFaceEemdding.FaceEmbedding
 	id, _ := format.GetFaceId()
 	faceEmbedding.FaceId = &id
@@ -78,13 +81,8 @@ func saveToDB(c *gin.Context, format *requestFormat) error {
 	faceEmbedding.Embedding = &format.Embedding
 	faceEmbedding.FaceImgURL = &format.FaceImg
 
-	if ok := modelFaceEemdding.CreateFace(&faceEmbedding); !ok {
-		response.ResponseBadRequest(c, "数据库存储错误")
+	if ok := mysqlFaceEmbedding.CreateFace(&faceEmbedding); !ok {
 		return errors.New("err")
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code": http.StatusOK,
-		"msg":  "存入数据库成功",
-	})
 	return nil
 }

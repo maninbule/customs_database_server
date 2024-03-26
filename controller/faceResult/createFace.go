@@ -1,19 +1,17 @@
 package faceResult
 
 import (
-	"errors"
-	"fmt"
 	"github.com/customs_database_server/controller/response"
-	"github.com/customs_database_server/model/modelFace"
+	mysqlFaceResult "github.com/customs_database_server/dao/mysql/FaceResult"
+	modelFaceResult "github.com/customs_database_server/model/modelFace"
 	"github.com/customs_database_server/util"
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"os"
 	"strconv"
 	"time"
 )
 
-type reuestFormat struct {
+type requestFormat struct {
 	FaceId         string `json:"face_id"`
 	Name           string `json:"name"`
 	FaceTime       string `json:"face_Time"`
@@ -22,7 +20,7 @@ type reuestFormat struct {
 	CameraID       string `json:"camera_id"`
 }
 
-func (r reuestFormat) Valid() bool {
+func (r requestFormat) Valid() bool {
 	keys := []string{
 		r.FaceId, r.Name, r.FaceTime, r.FaceImgCorrect, r.FaceImgPredict, r.CameraID,
 	}
@@ -40,12 +38,12 @@ func (r reuestFormat) Valid() bool {
 	return true
 }
 
-func (r reuestFormat) getId() (uint, error) {
+func (r requestFormat) getId() (uint, error) {
 	parseUint, err := strconv.ParseUint(r.FaceId, 0, 0)
 	return uint(parseUint), err
 }
 
-func (r reuestFormat) getTime() (time.Time, error) {
+func (r requestFormat) getTime() (time.Time, error) {
 	t, err := time.Parse("2006-01-02 15:04:05", r.FaceTime)
 	return t, err
 }
@@ -53,23 +51,22 @@ func (r reuestFormat) getTime() (time.Time, error) {
 func SaveFaceCompare(c *gin.Context) {
 	err := c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
-		response.ResponseBadRequest(c, "post数据过大")
+		response.ResponseErr(c, response.CodeErrReQuestTooLarge)
 		return
 	}
 	fileCorrectImg, ok1 := c.FormFile("face_Img_correct")
 	filePredictImg, ok2 := c.FormFile("face_Img_predict")
 	if ok1 != nil || ok2 != nil {
-		response.ResponseBadRequest(c, "缺少人脸图像字段")
+		response.ResponseErrWithMsg(c, response.CodeErrRequestParamNotExisted, "缺少人脸图像字段")
 		return
 	}
 	pathCorrectImg, err1 := util.SaveFileRecResult(c, fileCorrectImg)
 	pathPredictImg, err2 := util.SaveFileRecResult(c, filePredictImg)
 	if err1 != nil || err2 != nil {
-		fmt.Println("存储图片错误, ", err1, err2)
-		response.ResponseBadRequest(c, "存储图片错误")
+		response.ResponseErr(c, response.CodeErrDataBase)
 		return
 	}
-	var jsonFormat reuestFormat
+	var jsonFormat requestFormat
 	jsonFormat.FaceId = c.PostForm("face_id")
 	jsonFormat.Name = c.PostForm("name")
 	jsonFormat.FaceTime = c.PostForm("face_Time")
@@ -77,11 +74,12 @@ func SaveFaceCompare(c *gin.Context) {
 	jsonFormat.FaceImgCorrect = pathCorrectImg
 	jsonFormat.FaceImgPredict = pathPredictImg
 	if !jsonFormat.Valid() {
-		response.ResponseBadRequest(c, "传输数据不完整")
+		response.ResponseErr(c, response.CodeErrRequestParamNotExisted)
 		return
 	}
-	err = CreateFace(c, &jsonFormat)
-	if err != nil {
+	ok := CreateFace(c, &jsonFormat)
+	if !ok {
+		response.ResponseErr(c, response.CodeErrDataBase)
 		err := os.Remove(pathCorrectImg)
 		if err != nil {
 			return
@@ -90,11 +88,13 @@ func SaveFaceCompare(c *gin.Context) {
 		if err2 != nil {
 			return
 		}
+		return
 	}
+	response.ResponseOK(c)
 }
 
-func CreateFace(c *gin.Context, jsonFormat *reuestFormat) error {
-	face := modelFace.Face{}
+func CreateFace(c *gin.Context, jsonFormat *requestFormat) bool {
+	face := modelFaceResult.Face{}
 	id, _ := jsonFormat.getId()
 	face.FaceId = &id
 	face.Name = &jsonFormat.Name
@@ -104,18 +104,6 @@ func CreateFace(c *gin.Context, jsonFormat *reuestFormat) error {
 	t, _ := jsonFormat.getTime()
 	addTime := t.Add(-8 * time.Hour)
 	face.FaceTime = &addTime
-	fmt.Println("face格式化之后： ", face)
-	ok := modelFace.CreateFace(&face)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": http.StatusOK,
-			"err":  "入库失败",
-		})
-		return errors.New("err")
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"code": http.StatusOK,
-		"err":  "存入数据库成功",
-	})
-	return nil
+	ok := mysqlFaceResult.CreateFace(&face)
+	return ok
 }

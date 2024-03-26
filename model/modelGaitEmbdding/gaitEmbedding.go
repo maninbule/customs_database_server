@@ -1,7 +1,6 @@
 package modelGaitEmbdding
 
 import (
-	"github.com/customs_database_server/config"
 	"github.com/jinzhu/gorm"
 )
 
@@ -14,21 +13,22 @@ type GaitEmbedding struct {
 	GaitImgURL *string `gorm:"column:gait_img_url;type:varchar(255);not null;omitempty"`
 }
 
-func CreateGait(gait *GaitEmbedding) bool {
-	create := config.DB.Create(gait)
-	if create.Error != nil {
-		panic("数据库创建步态信息错误")
-		return false
-	}
-	return true
-}
-
-func GetAllGait() []GaitEmbedding {
-	allGait := make([]GaitEmbedding, 0)
-	find := config.DB.Model(&GaitEmbedding{}).Find(&allGait)
-	if find.Error != nil {
-		panic("获取步态库失败")
-		return nil
-	}
-	return allGait
-}
+//
+//func CreateGait(gait *GaitEmbedding) bool {
+//	create := config.DB.Create(gait)
+//	if create.Error != nil {
+//		panic("数据库创建步态信息错误")
+//		return false
+//	}
+//	return true
+//}
+//
+//func GetAllGait() []GaitEmbedding {
+//	allGait := make([]GaitEmbedding, 0)
+//	find := config.DB.Model(&GaitEmbedding{}).Find(&allGait)
+//	if find.Error != nil {
+//		panic("获取步态库失败")
+//		return nil
+//	}
+//	return allGait
+//}

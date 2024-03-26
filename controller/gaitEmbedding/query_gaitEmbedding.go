@@ -2,14 +2,14 @@ package gaitEmbedding
 
 import (
 	"github.com/customs_database_server/controller/response"
-	"github.com/customs_database_server/model/modelGaitEmbdding"
+	mysqlGaitEmbedding "github.com/customs_database_server/dao/mysql/GaitEmbedding"
 	"github.com/gin-gonic/gin"
 )
 
 func GetAllGaitEmbedding(c *gin.Context) {
-	allGait := modelGaitEmbdding.GetAllGait()
+	allGait := mysqlGaitEmbedding.GetAllGait()
 	if allGait == nil {
-		response.ResponseInternalErr(c, "获取步态数据失败")
+		response.ResponseErr(c, response.CodeErrDataBase)
 		return
 	}
 	response.ResponseOKWithData(c, allGait)

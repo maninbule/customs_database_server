@@ -1,15 +1,14 @@
 package modelAttr
 
 import (
-	"fmt"
-	"github.com/customs_database_server/config"
 	"github.com/jinzhu/gorm"
 	"time"
 )
 
+// mysql
 type Attribute struct {
 	gorm.Model
-	AttrID   *uint      `gorm:"column:attrId;type:int unsigned;not null"`
+	AttrID   *string    `gorm:"column:attrId;type:varchar(50);not null"`
 	Name     *string    `gorm:"column:name;type:varchar(50);"`
 	Hat      *bool      `gorm:"column:hat;type:TINYINT(1);not null"`
 	Glasses  *bool      `gorm:"column:glasses;type:TINYINT(1);not null"`
@@ -18,31 +17,14 @@ type Attribute struct {
 	FaceImg  *string    `gorm:"column:faceImg;type:LONGTEXT;not null"`
 }
 
-func CreateAttr(attr *Attribute) bool {
-	create := config.DB.Create(attr)
-	if create.Error != nil {
-		fmt.Println(create.Error)
-		return false
-	}
-	return true
-}
-
-func GetAllAttr() []Attribute {
-	allAttr := make([]Attribute, 0)
-	query := config.DB.Model(&Attribute{}).Find(&allAttr)
-	if query.Error != nil {
-		fmt.Println("query : ", query.Error)
-		return nil
-	}
-	return allAttr
-}
-
-func GetAttrByTime(startDate, endDate time.Time) []Attribute {
-	allAttr := make([]Attribute, 0)
-	query := config.DB.Model(&Attribute{}).Where("faceTime between ? and ?", startDate, endDate).Find(&allAttr)
-	if query.Error != nil {
-		fmt.Println("query : ", query.Error)
-		return nil
-	}
-	return allAttr
+// json
+type AttributeJson struct {
+	gorm.Model
+	AttrID   string    `json:"attr_id" binding:"required"`
+	Name     string    `json:"name" binding:"required"`
+	Hat      bool      `json:"hat" binding:"required"`
+	Glasses  bool      `json:"glasses" binding:"required"`
+	Mask     bool      `json:"mask" binding:"required"`
+	FaceTime time.Time `json:"face_time" binding:"required"`
+	FaceImg  string    `json:"face_img" binding:"required"`
 }

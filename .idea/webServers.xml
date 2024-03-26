@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="c4a49b6a-c185-4ef2-b098-1133d762c8a0" name="1609server">
+        <fileTransfer rootFolder="/home/lq/file/customs_database_server" accessType="SFTP" host="172.21.116.147" port="22" sshConfigId="e9828cd6-1bec-4635-90ca-b1947318db3e" sshConfig="lq@172.21.116.147:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

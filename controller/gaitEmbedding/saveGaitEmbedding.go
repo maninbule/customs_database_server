@@ -2,6 +2,7 @@ package gaitEmbedding
 
 import (
 	"github.com/customs_database_server/controller/response"
+	mysqlGaitEmbedding "github.com/customs_database_server/dao/mysql/GaitEmbedding"
 	"github.com/customs_database_server/model/modelGaitEmbdding"
 	"github.com/customs_database_server/util"
 	"github.com/gin-gonic/gin"
@@ -18,17 +19,17 @@ type requestFormat struct {
 
 func SaveGaitEmbedding(c *gin.Context) {
 	if err := c.Request.ParseMultipartForm(50 << 20); err != nil {
-		response.ResponseBadRequest(c, "post数据量过大")
+		response.ResponseErr(c, response.CodeErrReQuestTooLarge)
 		return
 	}
 	req := getReq(c)
 	if req == nil {
-		response.ResponseBadRequest(c, "传递的json不合法")
+		response.ResponseErr(c, response.CodeErrRequest)
 		return
 	}
 	path := getFilePath(c)
 	if path == nil {
-		response.ResponseBadRequest(c, "没有传输gait_img字段以及对应的文件")
+		response.ResponseErrWithMsg(c, response.CodeErrRequest, "没有传输gait_img字段以及对应的文件")
 		return
 	}
 	var modelGait modelGaitEmbdding.GaitEmbedding
@@ -37,15 +38,15 @@ func SaveGaitEmbedding(c *gin.Context) {
 	modelGait.Embedding = &req.Embedding
 	modelGait.FaceImgURL = &req.FaceImgUrl
 	modelGait.GaitImgURL = path
-	if ok := modelGaitEmbdding.CreateGait(&modelGait); !ok {
-		response.ResponseInternalErr(c, "服务器错误")
+	if ok := mysqlGaitEmbedding.CreateGait(&modelGait); !ok {
+		response.ResponseErr(c, response.CodeErrDataBase)
 		err := os.Remove(*path)
 		if err != nil {
 			return
 		}
 		return
 	} else {
-		response.ResponseOK(c, "存储成功")
+		response.ResponseOK(c)
 		return
 	}
 }

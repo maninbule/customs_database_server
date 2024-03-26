@@ -2,7 +2,7 @@ package faceResult
 
 import (
 	"github.com/customs_database_server/controller/response"
-	"github.com/customs_database_server/model/modelFace"
+	mysqlFaceResult "github.com/customs_database_server/dao/mysql/FaceResult"
 	"github.com/customs_database_server/util"
 	"github.com/gin-gonic/gin"
 	"time"
@@ -37,37 +37,37 @@ func QueryFaceByCondition(c *gin.Context) {
 	err := c.Bind(&condition)
 	L1, L2 := len(condition.TimeStart), len(condition.TimeEnd)
 	if err != nil || (L1+L2 > 0 && L1*L2 == 0) {
-		response.ResponseBadRequest(c, "时间字段不能为空")
+		response.ResponseErrWithMsg(c, response.CodeErrRequestParamNotExisted, "时间字段不完整")
 		return
 	}
-	query := modelFace.CreateQuery()
+	query := mysqlFaceResult.CreateQuery()
 	if len(condition.CameraID) > 0 {
-		query = modelFace.GetFaceByCameraID(query, condition.CameraID)
+		query = mysqlFaceResult.GetFaceByCameraID(query, condition.CameraID)
 	}
 	if L1+L2 > 0 && L1*L2 != 0 {
 		var start, end time.Time
 		ok1 := util.ParseTime(condition.TimeStart, &start)
 		ok2 := util.ParseTime(condition.TimeEnd, &end)
 		if !ok1 || !ok2 {
-			response.ResponseBadRequest(c, "时间转换错误")
+			response.ResponseErrWithMsg(c, response.CodeErrRequest, "时间格式不正确")
 			return
 		}
-		query = modelFace.GetFaceByTimeInterval(query, start, end)
+		query = mysqlFaceResult.GetFaceByTimeInterval(query, start, end)
 	}
 	if len(condition.Name) > 0 {
-		query = modelFace.GetFaceByName(query, condition.Name)
+		query = mysqlFaceResult.GetFaceByName(query, condition.Name)
 	}
 	if len(condition.ID) > 0 {
 		if id, err := util.ParseInt(condition.ID); err == nil {
-			query = modelFace.GetFaceById(query, id)
+			query = mysqlFaceResult.GetFaceById(query, id)
 		} else {
-			response.ResponseBadRequest(c, "id字段需要为整数")
+			response.ResponseErrWithMsg(c, response.CodeErrRequest, "id字段需要为整数")
 			return
 		}
 	}
-	result := modelFace.GetResult(query)
+	result := mysqlFaceResult.GetResult(query)
 	if result == nil {
-		response.ResponseBadRequest(c, "数据库错误")
+		response.ResponseErr(c, response.CodeErrDataBase)
 		return
 	} else {
 		response.ResponseOKWithData(c, result)

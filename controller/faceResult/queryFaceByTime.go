@@ -1,10 +1,9 @@
 package faceResult
 
 import (
-	"fmt"
-	"github.com/customs_database_server/model/modelFace"
+	"github.com/customs_database_server/controller/response"
+	mysqlFaceResult "github.com/customs_database_server/dao/mysql/FaceResult"
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"time"
 )
 
@@ -15,25 +14,14 @@ func QueryFaceByTime(c *gin.Context) {
 	start, err1 := time.Parse("2006-01-02 15:04:05", startTime)
 	end, err2 := time.Parse("2006-01-02 15:04:05", endTime)
 	if err1 != nil || err2 != nil || end.Sub(start) < 0 {
-		fmt.Println("time.Parse ", err1, err2)
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": http.StatusBadRequest,
-			"err":  "时间错误",
-		})
-	}
-
-	allFace := modelFace.GetFaceByTime(start, end)
-	if allFace == nil {
-		fmt.Println("model.GetFaceByTime err")
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": http.StatusInternalServerError,
-			"err":  "数据库查询错误",
-		})
+		response.ResponseErrWithMsg(c, response.CodeErrRequest, "时间错误格式错误")
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code":        http.StatusOK,
-		"data-length": len(allFace),
-		"data":        allFace,
-	})
+
+	allFace := mysqlFaceResult.GetFaceByTime(start, end)
+	if allFace == nil {
+		response.ResponseErr(c, response.CodeErrDataBase)
+		return
+	}
+	response.ResponseOKWithData(c, allFace)
 }

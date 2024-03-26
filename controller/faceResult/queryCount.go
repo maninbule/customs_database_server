@@ -2,11 +2,11 @@ package faceResult
 
 import (
 	"github.com/customs_database_server/controller/response"
-	"github.com/customs_database_server/model/modelFace"
+	mysqlFaceResult "github.com/customs_database_server/dao/mysql/FaceResult"
 	"github.com/gin-gonic/gin"
 )
 
 func GetFaceCount(c *gin.Context) {
-	cnt := modelFace.GetCount()
+	cnt := mysqlFaceResult.GetCount()
 	response.ResponseOKWithData(c, cnt)
 }

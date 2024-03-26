@@ -1,11 +1,12 @@
 package modelFaceEemdding
 
 import (
-	"fmt"
-	"github.com/customs_database_server/config"
+	"encoding/base64"
+	"github.com/customs_database_server/util"
 	"github.com/jinzhu/gorm"
 )
 
+// mysql
 type FaceEmbedding struct {
 	gorm.Model
 	FaceId     *uint   `gorm:"column:faceId;type:int unsigned;not null;omitempty" json:"face_id"`
@@ -14,21 +15,33 @@ type FaceEmbedding struct {
 	FaceImgURL *string `gorm:"column:face_img_url;type:varchar(255);not null;omitempty" json:"faceImgURL"`
 }
 
-func CreateFace(face *FaceEmbedding) bool {
-	create := config.DB.Create(face)
-	if create.Error != nil {
-		fmt.Println(create.Error)
-		return false
-	}
-	return true
+// redis使用
+type RedisInFaceEb struct {
+	FaceId   uint
+	Name     string
+	fileName string
+	ImgData  []byte
 }
 
-func GetAllFace() []FaceEmbedding {
-	allFace := make([]FaceEmbedding, 0)
-	find := config.DB.Model(&FaceEmbedding{}).Find(&allFace)
-	if find.Error != nil {
-		panic("sql执行错误[获取人脸向量数据失败]： GetallFace")
-		return nil
+type RedisOutFaceEb struct {
+	FaceId       uint
+	Name         string
+	ImgData      []byte
+	ImgEmbedding []byte
+}
+
+// model互相转换
+
+func RedisOutToFaceEmbedding(r *RedisOutFaceEb) (*FaceEmbedding, error) {
+	var res FaceEmbedding
+	res.Name = &r.Name
+	res.FaceId = &r.FaceId
+	toString := base64.StdEncoding.EncodeToString(r.ImgEmbedding)
+	res.Embedding = &toString
+	fileUrl, err := util.SaveFileFaceDataBaseFromByte(r.ImgData, ".png")
+	if err != nil {
+		return nil, err
 	}
-	return allFace
+	res.FaceImgURL = &fileUrl
+	return &res, nil
 }

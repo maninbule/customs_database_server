@@ -2,7 +2,7 @@ package gaitResult
 
 import (
 	"github.com/customs_database_server/controller/response"
-	"github.com/customs_database_server/model/modelGait"
+	mysqlGaitResult "github.com/customs_database_server/dao/mysql/GaitResult"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
@@ -13,14 +13,14 @@ func QueryFaceByLimit(c *gin.Context) {
 	right := c.Param("right")
 	l, err1 := strconv.ParseInt(left, 0, 0)
 	r, err2 := strconv.ParseInt(right, 0, 0)
-	total := modelGait.GaitCount()
+	total := mysqlGaitResult.GaitCount()
 	if err1 != nil || err2 != nil || l > r || l < 1 || r > total {
-		response.ResponseBadRequest(c, "分页区间不合法")
+		response.ResponseErr(c, response.CodeErrRequest)
 		return
 	}
-	allGait := modelGait.GetFaceByLR(l, r)
+	allGait := mysqlGaitResult.GetFaceByLR(l, r)
 	if allGait == nil {
-		response.ResponseInternalErr(c, "从数据库获取数据失败")
+		response.ResponseErr(c, response.CodeErrDataBase)
 		return
 	} else {
 		response.ResponseOKWithData(c, allGait)

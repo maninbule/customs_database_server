@@ -1,23 +1,16 @@
 package faceResult
 
 import (
-	"github.com/customs_database_server/model/modelFace"
+	"github.com/customs_database_server/controller/response"
+	mysqlFaceResult "github.com/customs_database_server/dao/mysql/FaceResult"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func QueryAllFace(c *gin.Context) {
-	allFace := modelFace.GetAllFace()
+	allFace := mysqlFaceResult.GetAllFace()
 	if allFace == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": http.StatusInternalServerError,
-			"err":  "服务器错误",
-		})
+		response.ResponseErr(c, response.CodeErrDataBase)
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code":        http.StatusOK,
-		"data-length": len(allFace),
-		"data":        allFace,
-	})
+	response.ResponseOKWithData(c, allFace)
 }

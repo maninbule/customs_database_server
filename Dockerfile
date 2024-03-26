@@ -3,15 +3,16 @@
 FROM golang:1.21
 WORKDIR /app
 
+ENV CGO_ENABLED=0
+ENV GOOS=linux
 ENV GOPROXY=https://goproxy.io,direct
 
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY . /app
-# 入口脚本
-COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY . .
 EXPOSE 8082
-
-ENTRYPOINT ["entrypoint.sh"]
+# 入口脚本
+COPY enter.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/enter.sh
+ENTRYPOINT ["enter.sh"]
