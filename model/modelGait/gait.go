@@ -1,6 +1,8 @@
 package modelGaitResult
 
 import (
+	"fmt"
+	"github.com/customs_database_server/util"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -13,6 +15,38 @@ type Gait struct {
 	FaceTime   *time.Time `gorm:"column:face_time;not null;omitempty"`
 	FaceImgURL *string    `gorm:"column:face_img_url;type:varchar(255);not null;omitempty"`
 	GaitImgURL *string    `gorm:"column:gait_img_url;type:varchar(255);not null;omitempty"`
+}
+
+// 请求参数
+
+type GaitRequest struct {
+	FaceId     string `json:"face_id" binding:"required"`
+	Name       string `json:"name" binding:"required"`
+	CameraID   string `json:"camera_id" binding:"required"`
+	FaceTime   string `json:"face_time" binding:"required"`
+	FaceImgURL string `json:"face_img_url" binding:"required"`
+	GaitImg    []byte `json:"gait_img" binding:"required"`
+}
+
+func ConvertGaitRequestToGait(g *GaitRequest) (*Gait, bool) {
+	var res Gait
+	res.FaceId = &g.FaceId
+	res.Name = &g.Name
+	res.CameraID = &g.CameraID
+	var t time.Time
+	ok := util.ParseTime(g.FaceTime, &t)
+	if !ok {
+		return nil, false
+	}
+	res.FaceTime = &t
+	res.FaceImgURL = &g.FaceImgURL
+	path, err := util.SaveFileFaceDataBaseFromByte(g.GaitImg, ".png")
+	if err != nil {
+		fmt.Println(err)
+		return nil, false
+	}
+	res.GaitImgURL = &path
+	return &res, true
 }
 
 //

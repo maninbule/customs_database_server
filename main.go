@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/customs_database_server/config"
-	logicfaceEmbedding "github.com/customs_database_server/logic/faceEmbedding"
 	"github.com/customs_database_server/model"
 	"github.com/customs_database_server/router"
 )
@@ -14,7 +13,6 @@ func main() {
 	fmt.Println("connect database successful...2222")
 	model.InitModel() // 初始化数据库表
 	fmt.Println("build face database")
-	logicfaceEmbedding.Enter()
 	fmt.Println("finish face database")
 	router.InitRouter() // 初始化路由
 

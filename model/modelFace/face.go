@@ -11,12 +11,12 @@ import (
 // 数据库用
 type Face struct {
 	gorm.Model
-	FaceId         *uint      `gorm:"column:faceId;type:int unsigned;not null;omitempty"`
-	Name           *string    `gorm:"column:name;type:varchar(50);not null;omitempty"`
-	FaceTime       *time.Time `gorm:"column:faceTime;not null;omitempty"`
-	CameraID       *string    `gorm:"column:cameraID;not null;omitempty"`
-	FaceImgCorrect *string    `gorm:"column:faceImgCorrect;type:varchar(255);not null;omitempty"`
-	FaceImgPredict *string    `gorm:"column:faceImgPredict;type:varchar(255);not null;omitempty"`
+	FaceId         *uint      `gorm:"column:faceId;type:int unsigned;not null;omitempty" json:"faceId"`
+	Name           *string    `gorm:"column:name;type:varchar(50);not null;omitempty" json:"name"`
+	FaceTime       *time.Time `gorm:"column:faceTime;not null;omitempty" json:"faceTime"`
+	CameraID       *string    `gorm:"column:cameraID;not null;omitempty" json:"cameraID"`
+	FaceImgCorrect *string    `gorm:"column:faceImgCorrect;type:varchar(255);not null;omitempty" json:"faceImgCorrect"`
+	FaceImgPredict *string    `gorm:"column:faceImgPredict;type:varchar(255);not null;omitempty" json:"faceImgPredict"`
 }
 
 // 前端使用

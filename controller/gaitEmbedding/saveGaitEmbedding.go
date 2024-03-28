@@ -60,7 +60,7 @@ func getReq(c *gin.Context) *requestFormat {
 }
 
 func getFilePath(c *gin.Context) *string {
-	file, err := c.FormFile("gait_img")
+	file, err := c.FormFile("gait_img_file")
 	if err != nil {
 		return nil
 	}

@@ -5,6 +5,7 @@ import (
 	"github.com/customs_database_server/config"
 	modelFaceResult "github.com/customs_database_server/model/modelFace"
 	"github.com/jinzhu/gorm"
+	"sort"
 	"time"
 )
 
@@ -74,6 +75,7 @@ func GetFaceByCameraID(db *gorm.DB, id string) *gorm.DB {
 }
 
 func GetFaceByTimeInterval(db *gorm.DB, startTime, endTime time.Time) *gorm.DB {
+	fmt.Println(startTime, endTime)
 	return db.Where("faceTime between ? and ?", startTime, endTime)
 }
 
@@ -89,7 +91,11 @@ func GetResult(db *gorm.DB) []modelFaceResult.Face {
 	faces := make([]modelFaceResult.Face, 0)
 	find := db.Find(&faces)
 	if find.Error != nil {
+		fmt.Println("find.Error = ", find.Error)
 		return nil
 	}
+	sort.Slice(faces, func(i, j int) bool {
+		return faces[i].FaceTime.After(*faces[j].FaceTime)
+	})
 	return faces
 }

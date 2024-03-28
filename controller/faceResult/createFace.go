@@ -1,6 +1,7 @@
 package faceResult
 
 import (
+	"fmt"
 	"github.com/customs_database_server/controller/response"
 	mysqlFaceResult "github.com/customs_database_server/dao/mysql/FaceResult"
 	modelFaceResult "github.com/customs_database_server/model/modelFace"
@@ -21,6 +22,7 @@ type requestFormat struct {
 }
 
 func (r requestFormat) Valid() bool {
+	fmt.Println(r)
 	keys := []string{
 		r.FaceId, r.Name, r.FaceTime, r.FaceImgCorrect, r.FaceImgPredict, r.CameraID,
 	}
@@ -30,9 +32,11 @@ func (r requestFormat) Valid() bool {
 		}
 	}
 	if _, err := r.getTime(); err != nil {
+		fmt.Println(err)
 		return false
 	}
 	if _, err := r.getId(); err != nil {
+		fmt.Println(err)
 		return false
 	}
 	return true

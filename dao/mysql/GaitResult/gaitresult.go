@@ -2,12 +2,13 @@ package mysqlGaitResult
 
 import (
 	"github.com/customs_database_server/config"
+	modelGaitResult "github.com/customs_database_server/model/modelGait"
 	"github.com/customs_database_server/model/modelGaitEmbdding"
 	"github.com/jinzhu/gorm"
 	"time"
 )
 
-func CreateGait(g *modelGaitEmbdding.GaitEmbedding) bool {
+func CreateGait(g *modelGaitResult.Gait) bool {
 	create := config.DB.Create(g)
 	if create.Error != nil {
 		panic("数据库存储错误 CreateGait")

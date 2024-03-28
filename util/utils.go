@@ -29,10 +29,14 @@ func ParseBody(c *gin.Context, format interface{}) bool {
 
 func ParseTime(timeStr string, t *time.Time) bool {
 	result, err := time.Parse("2006-01-02 15:04:05", timeStr)
+	fmt.Println("timeStr = ", timeStr)
+	fmt.Println("result = ", result)
+	fmt.Println("err = ", err)
 	if err != nil {
 		return false
 	}
-	t = &result
+	*t = result
+	fmt.Println("t = ", *t)
 	return true
 }
 

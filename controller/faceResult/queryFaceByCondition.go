@@ -1,6 +1,7 @@
 package faceResult
 
 import (
+	"fmt"
 	"github.com/customs_database_server/controller/response"
 	mysqlFaceResult "github.com/customs_database_server/dao/mysql/FaceResult"
 	"github.com/customs_database_server/util"
@@ -40,6 +41,7 @@ func QueryFaceByCondition(c *gin.Context) {
 		response.ResponseErrWithMsg(c, response.CodeErrRequestParamNotExisted, "时间字段不完整")
 		return
 	}
+	fmt.Println("condition: ", condition)
 	query := mysqlFaceResult.CreateQuery()
 	if len(condition.CameraID) > 0 {
 		query = mysqlFaceResult.GetFaceByCameraID(query, condition.CameraID)
@@ -48,6 +50,8 @@ func QueryFaceByCondition(c *gin.Context) {
 		var start, end time.Time
 		ok1 := util.ParseTime(condition.TimeStart, &start)
 		ok2 := util.ParseTime(condition.TimeEnd, &end)
+		fmt.Println("start = ", start)
+		fmt.Println("end = ", end)
 		if !ok1 || !ok2 {
 			response.ResponseErrWithMsg(c, response.CodeErrRequest, "时间格式不正确")
 			return
@@ -66,6 +70,7 @@ func QueryFaceByCondition(c *gin.Context) {
 		}
 	}
 	result := mysqlFaceResult.GetResult(query)
+	fmt.Println("GetResult = ", result)
 	if result == nil {
 		response.ResponseErr(c, response.CodeErrDataBase)
 		return

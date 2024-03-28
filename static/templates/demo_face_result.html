@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查询条件与结果展示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"] {
+            width: calc(100% - 12px);
+            padding: 6px;
+            margin-bottom: 10px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+    </style>
+</head>
+<body>
+
+<form id="queryForm">
+    <label for="id">ID:</label>
+    <input type="text" id="id" name="id">
+
+    <label for="name">名字:</label>
+    <input type="text" id="name" name="name">
+
+    <label for="timeStart">开始时间:</label>
+    <input type="text" id="timeStart" name="timeStart">
+
+    <label for="timeEnd">结束时间:</label>
+    <input type="text" id="timeEnd" name="timeEnd">
+
+    <label for="cameraID">摄像头编号:</label>
+    <input type="text" id="cameraID" name="cameraID">
+
+    <input type="submit" value="提交">
+</form>
+
+<div id="resultTable">
+    <!-- 查询结果将显示在这里 -->
+</div>
+
+<script>
+    document.getElementById("queryForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+        var queryData = {};
+        formData.forEach(function(value, key){
+            queryData[key] = value;
+        });
+
+        // 时间检查
+        if ((queryData["timeStart"] && !queryData["timeEnd"]) || (!queryData["timeStart"] && queryData["timeEnd"])) {
+            alert("时间开始和结束时间必须同时存在或者同时不存在");
+            return;
+        }
+
+        // 发送 POST 请求到后端
+        fetch("http://172.21.116.147:8082/face_query", {
+            method: "POST",
+            body: JSON.stringify(queryData),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                updateTable(data.data); // 更新表格内容
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 处理错误情况
+            });
+    });
+
+    // 更新表格内容
+    function updateTable(data) {
+        var tableContent = '<table><tr><th>ID</th><th>名字</th><th>抓拍时间</th><th>摄像头编号</th><th>底库照片</th><th>抓拍照片</th></tr>';
+        data.forEach(function(face) {
+            tableContent += '<tr>';
+            tableContent += '<td>' + face.faceId + '</td>';
+            tableContent += '<td>' + face.name + '</td>';
+            tableContent += '<td>' + new Date(face.faceTime).toLocaleString() + '</td>';
+            tableContent += '<td>' + face.cameraID + '</td>';
+            tableContent += '<td><img src="' + face.faceImgCorrect + '" alt="Correct Image"></td>';
+            tableContent += '<td><img src="' + face.faceImgPredict + '" alt="Predict Image"></td>';
+            tableContent += '</tr>';
+        });
+        tableContent += '</table>';
+        document.getElementById('resultTable').innerHTML = tableContent;
+    }
+</script>
+
+</body>
+</html>

@@ -6,6 +6,7 @@ import (
 	mysqlFaceEmbedding "github.com/customs_database_server/dao/mysql/FaceEmbedding"
 	redisFaceEmbedding "github.com/customs_database_server/dao/redis/faceEmbedding"
 	"github.com/customs_database_server/model/modelFaceEemdding"
+	"github.com/gin-gonic/gin"
 	"io"
 	"os"
 	"time"
@@ -13,7 +14,6 @@ import (
 
 /*
 主要用于加载人脸图像，将人脸图像发送到redis，传递给python算法进行处理
-
 从redis接收图像，并保存到mysql
 */
 
@@ -22,7 +22,7 @@ const name_path = "static/tmp/name"
 
 var cnt int
 
-func Enter() {
+func Enter(c *gin.Context) {
 	fmt.Println("进入建库函数")
 	names, err := LoadNameFromTxt(name_path)
 	if err != nil {
@@ -38,7 +38,6 @@ func Enter() {
 	go func() {
 		SaveToDb()
 	}()
-
 }
 
 func LoadNameFromTxt(path string) ([]string, error) {
