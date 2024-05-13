@@ -66,3 +66,21 @@ func Convert(r *RedisOutFaceResult) (*Face, error) {
 	res.FaceImgPredict = &path2
 	return &res, nil
 }
+
+// BeforeSave hook to set FaceTime to UTC before saving to database
+func (face *Face) BeforeSave() (err error) {
+	if face.FaceTime != nil {
+		*face.FaceTime = face.FaceTime.UTC()
+	}
+	return nil
+}
+
+func (f *Face) ConvertUTCtoLocalTime(location string) error {
+	loc, err := time.LoadLocation(location)
+	if err != nil {
+		return err
+	}
+	t := f.FaceTime.In(loc)
+	f.FaceTime = &t
+	return nil
+}

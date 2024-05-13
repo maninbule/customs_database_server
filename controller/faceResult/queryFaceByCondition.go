@@ -56,6 +56,12 @@ func QueryFaceByCondition(c *gin.Context) {
 		return
 	}
 	result := mysqlFaceResult.GetResultWithLimit(query, offset, limit)
+	for i, _ := range result {
+		err1 := result[i].ConvertUTCtoLocalTime("Asia/Shanghai")
+		if err1 != nil {
+			response.ResponseErr(c, response.CodeErrServerErr)
+		}
+	}
 	//result := mysqlFaceResult.GetResult(query)
 	fmt.Println("GetResult = ", result)
 	if result == nil {

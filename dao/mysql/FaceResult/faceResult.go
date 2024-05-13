@@ -13,6 +13,7 @@ func CreateFace(face *modelFaceResult.Face) bool {
 	//if config.DB.NewRecord(faceImgDataBase) {
 	//	return false
 	//}
+	face.BeforeSave()
 	create := config.DB.Create(face)
 	if create.Error != nil {
 		fmt.Println(create.Error)
