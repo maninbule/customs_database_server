@@ -1,7 +1,7 @@
 package faceEmbedding
 
 import (
-	"errors"
+	"fmt"
 	"github.com/customs_database_server/controller/response"
 	mysqlFaceEmbedding "github.com/customs_database_server/dao/mysql/FaceEmbedding"
 	"github.com/customs_database_server/model/modelFaceEemdding"
@@ -11,78 +11,58 @@ import (
 	"strconv"
 )
 
-type requestFormat struct {
-	FaceId    string `json:"face_id"`
-	Name      string `json:"name"`
-	Embedding string `json:"embedding"`
-	FaceImg   string `json:"face_img"`
-}
-
-func (r requestFormat) Valid() bool {
-	keys := []string{
-		r.Name, r.FaceId, r.FaceImg, r.FaceImg,
-	}
-	for _, key := range keys {
-		if len(key) == 0 {
-			return false
-		}
-	}
-	if _, err := r.GetFaceId(); err != nil {
-		return false
-	}
-	return true
-}
-
-func (r requestFormat) GetFaceId() (uint, error) {
-	parseUint, err := strconv.ParseUint(r.FaceId, 0, 0)
-	return uint(parseUint), err
-}
-
-func SaveFaceEmbedding(c *gin.Context) {
+func paramRequest(c *gin.Context) (*modelFaceEemdding.RequestFormat, error) {
+	// 将formdata的内容存入requestFormat
 	err := c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
 		response.ResponseErr(c, response.CodeErrReQuestTooLarge)
-		return
+		return nil, err
 	}
+	// 绑定参数
+	var req modelFaceEemdding.RequestFormat
+	if err = c.ShouldBind(&req); err != nil {
+		return nil, err
+	}
+	// 检查face_id是否是整数
+	_, err = strconv.ParseUint(req.FaceId, 0, 0)
+	if err != nil {
+		response.ResponseErrWithMsg(c, response.CodeErrRequest, "face_id字段非法")
+		return nil, err
+	}
+	// 存储文件
 	faceImg, err := c.FormFile("face_img")
 	if err != nil {
 		response.ResponseErrWithMsg(c, response.CodeErrRequestParamNotExisted, "传输的数据不存在对应face_img的文件")
-		return
+		return nil, err
 	}
 	path, err := util.SaveFileFaceDataBase(c, faceImg)
 	if err != nil {
 		response.ResponseErr(c, response.CodeErrDataBase)
+		return nil, err
+	}
+	req.FaceImg = path
+	return &req, nil
+}
+
+func SaveFaceEmbedding(c *gin.Context) {
+	fmt.Println("enter SaveFaceEmbedding")
+	req, err := paramRequest(c)
+	if err != nil {
+		fmt.Println("SaveFaceEmbedding : ", err)
 		return
 	}
-	var format requestFormat
-	format.FaceId = c.PostForm("face_id")
-	format.Name = c.PostForm("name")
-	format.Embedding = c.PostForm("embedding")
-	format.FaceImg = path
-	err = saveToDB(&format)
-	if err != nil {
+	embedding := modelFaceEemdding.RequestFormatToFaceEmbedding(req)
+	ok := mysqlFaceEmbedding.CreateFace(embedding)
+	if !ok { // 存储不成功
+		fmt.Println("!ok 存储不成功")
 		response.ResponseErr(c, response.CodeErrDataBase)
-		err := os.Remove(path)
+		err := os.Remove(req.FaceImg)
 		if err != nil {
-			response.ResponseErr(c, response.CodeErrDataBase)
+			//response.ResponseErr(c, response.CodeErrDataBase)
 			return
 		}
 		return
 	} else {
-		response.ResponseOK(c)
+		response.ResponseOKWithData(c, gin.H{"img_url": embedding.FaceImgURL})
 	}
-}
-
-func saveToDB(format *requestFormat) error {
-	var faceEmbedding modelFaceEemdding.FaceEmbedding
-	id, _ := format.GetFaceId()
-	faceEmbedding.FaceId = &id
-	faceEmbedding.Name = &format.Name
-	faceEmbedding.Embedding = &format.Embedding
-	faceEmbedding.FaceImgURL = &format.FaceImg
-
-	if ok := mysqlFaceEmbedding.CreateFace(&faceEmbedding); !ok {
-		return errors.New("err")
-	}
-	return nil
 }

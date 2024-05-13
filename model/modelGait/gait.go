@@ -1,6 +1,7 @@
 package modelGaitResult
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/customs_database_server/util"
 	"github.com/jinzhu/gorm"
@@ -25,7 +26,7 @@ type GaitRequest struct {
 	CameraID   string `json:"camera_id" binding:"required"`
 	FaceTime   string `json:"face_time" binding:"required"`
 	FaceImgURL string `json:"face_img_url" binding:"required"`
-	GaitImg    []byte `json:"gait_img" binding:"required"`
+	GaitImg    string `json:"gait_img" binding:"required"`
 }
 
 func ConvertGaitRequestToGait(g *GaitRequest) (*Gait, bool) {
@@ -40,7 +41,11 @@ func ConvertGaitRequestToGait(g *GaitRequest) (*Gait, bool) {
 	}
 	res.FaceTime = &t
 	res.FaceImgURL = &g.FaceImgURL
-	path, err := util.SaveFileFaceDataBaseFromByte(g.GaitImg, ".png")
+	bytes, err2 := base64.StdEncoding.DecodeString(g.GaitImg)
+	if err2 != nil {
+		return nil, false
+	}
+	path, err := util.SaveFileFaceDataBaseFromByte(bytes, ".png")
 	if err != nil {
 		fmt.Println(err)
 		return nil, false

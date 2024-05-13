@@ -10,7 +10,7 @@ import (
 
 // 数据库用
 type Face struct {
-	gorm.Model
+	gorm.Model     `json:"-"`
 	FaceId         *uint      `gorm:"column:faceId;type:int unsigned;not null;omitempty" json:"faceId"`
 	Name           *string    `gorm:"column:name;type:varchar(50);not null;omitempty" json:"name"`
 	FaceTime       *time.Time `gorm:"column:faceTime;not null;omitempty" json:"faceTime"`

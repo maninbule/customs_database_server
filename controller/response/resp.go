@@ -18,6 +18,7 @@ const (
 	CodeErrServerErr
 	CodeErrDataBase
 	CodeErrDataNotExisted
+	CodeErrExistedFace
 )
 
 var codeMap = map[CodeErr]string{
@@ -27,6 +28,7 @@ var codeMap = map[CodeErr]string{
 	CodeErrServerErr:              "服务器处理错误",
 	CodeErrDataBase:               "数据库错误",
 	CodeErrDataNotExisted:         "请求的数据不存在",
+	CodeErrExistedFace:            "重复的人脸",
 }
 
 func (c CodeErr) Msg() string {

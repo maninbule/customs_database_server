@@ -3,7 +3,6 @@ package mysqlGaitResult
 import (
 	"github.com/customs_database_server/config"
 	modelGaitResult "github.com/customs_database_server/model/modelGait"
-	"github.com/customs_database_server/model/modelGaitEmbdding"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -19,7 +18,7 @@ func CreateGait(g *modelGaitResult.Gait) bool {
 
 func GaitCount() int64 {
 	var cnt int64
-	count := config.DB.Model(&modelGaitEmbdding.GaitEmbedding{}).Count(&cnt)
+	count := config.DB.Model(&modelGaitResult.Gait{}).Count(&cnt)
 	if count.Error != nil {
 		panic("数据库获取步态结果个数失败")
 		return 0
@@ -27,9 +26,9 @@ func GaitCount() int64 {
 	return cnt
 }
 
-func GetFaceByLR(l, r int64) []modelGaitEmbdding.GaitEmbedding {
-	allGait := make([]modelGaitEmbdding.GaitEmbedding, 0)
-	query := config.DB.Model(&modelGaitEmbdding.GaitEmbedding{}).Offset(l - 1).Limit(r - l + 1).Find(&allGait)
+func GetFaceByLR(l, r int64) []modelGaitResult.Gait {
+	allGait := make([]modelGaitResult.Gait, 0)
+	query := config.DB.Model(&modelGaitResult.Gait{}).Offset(l - 1).Limit(r - l + 1).Find(&allGait)
 	if query.Error != nil {
 		panic("sql执行错误[分页查询步态识别结果失败]")
 	}
@@ -37,7 +36,7 @@ func GetFaceByLR(l, r int64) []modelGaitEmbdding.GaitEmbedding {
 }
 
 func CreateQuery() *gorm.DB {
-	return config.DB.Model(&modelGaitEmbdding.GaitEmbedding{})
+	return config.DB.Model(&modelGaitResult.Gait{})
 }
 
 func GetGaitByCameraId(db *gorm.DB, id string) *gorm.DB {
@@ -56,8 +55,8 @@ func GetFaceById(db *gorm.DB, id int64) *gorm.DB {
 	return db.Where("face_id = ?", id)
 }
 
-func GetResult(db *gorm.DB) []modelGaitEmbdding.GaitEmbedding {
-	gaits := make([]modelGaitEmbdding.GaitEmbedding, 0)
+func GetResult(db *gorm.DB) []modelGaitResult.Gait {
+	gaits := make([]modelGaitResult.Gait, 0)
 	find := db.Find(&gaits)
 	if find.Error != nil {
 		return nil

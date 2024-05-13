@@ -65,16 +65,17 @@
     <input type="text" id="name" name="name">
 
     <label for="timeStart">开始时间:</label>
-    <input type="text" id="timeStart" name="timeStart">
+    <input type="datetime-local" id="timeStart" name="timeStart" value="2024-01-01T00:00">
 
     <label for="timeEnd">结束时间:</label>
-    <input type="text" id="timeEnd" name="timeEnd">
+    <input type="datetime-local" id="timeEnd" name="timeEnd" value="2024-12-24T00:00">
 
     <label for="cameraID">摄像头编号:</label>
     <input type="text" id="cameraID" name="cameraID">
 
     <input type="submit" value="提交">
 </form>
+
 
 <div id="resultTable">
     <!-- 查询结果将显示在这里 -->
@@ -88,7 +89,10 @@
         formData.forEach(function(value, key){
             queryData[key] = value;
         });
-
+        queryData["timeStart"] = queryData["timeStart"].replace('T', ' ') + ":00"
+        queryData["timeEnd"] = queryData["timeEnd"].replace('T', ' ') + ":00"
+        console.log(queryData["timeStart"])
+        console.log(queryData["timeEnd"])
         // 时间检查
         if ((queryData["timeStart"] && !queryData["timeEnd"]) || (!queryData["timeStart"] && queryData["timeEnd"])) {
             alert("时间开始和结束时间必须同时存在或者同时不存在");

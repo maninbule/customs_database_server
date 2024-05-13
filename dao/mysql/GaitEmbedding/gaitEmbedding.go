@@ -6,7 +6,7 @@ import (
 )
 
 func CreateGait(gait *modelGaitEmbdding.GaitEmbedding) bool {
-	create := config.DB.Create(gait)
+	create := config.DB.Model(&modelGaitEmbdding.GaitEmbedding{}).Create(gait)
 	if create.Error != nil {
 		panic("数据库创建步态信息错误")
 		return false

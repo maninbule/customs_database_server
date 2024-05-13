@@ -1,56 +1,27 @@
-package faceResult
+package AttrResult
 
 import (
 	"fmt"
 	"github.com/customs_database_server/controller/response"
-	mysqlFaceResult "github.com/customs_database_server/dao/mysql/FaceResult"
+	mysqlAttrResult "github.com/customs_database_server/dao/mysql/AttrResult"
+	"github.com/customs_database_server/model/modelAttr"
 	"github.com/customs_database_server/util"
 	"github.com/gin-gonic/gin"
 	"time"
 )
 
-/*
-name: 名字
-time_interval: 时间区间
-camera_position：摄像头机位
-
-{
-	"id":"",
-    "name":"",
-    "timeStart":"",
-    "timeEnd":"2024-3-12 00:00:00",
-    "cameraID":"1"
-}
-
-按照摄像头id，时间区间，名字，id依次进行过滤查询
-*/
-
-type queryCondition struct {
-	ID        string `json:"id" form:"id"`
-	Name      string `json:"name" form:"name"`
-	TimeStart string `json:"timeStart" form:"timeStart"`
-	TimeEnd   string `json:"timeEnd" form:"timeEnd"`
-	CameraID  string `json:"cameraID" form:"cameraID"`
-}
-
-// QueryFaceByCondition 根据多种条件进行查询人脸识别结果
-// @Summary 查询接口
-// @Description 每个字段都可以为空，类似复选框
-// @Tags 人脸识别结果
-// @Accept application/x-www-form-urlencoded
-// @Produce application/json
-// @Param object formData queryCondition false "查询参数"
-// @Success 200 {object} responseModel.Face
-// @Router /face_query [post]
 func QueryFaceByCondition(c *gin.Context) {
 	err2 := c.Request.ParseForm()
 	if err2 != nil {
 		response.ResponseErr(c, response.CodeErrRequest)
 		return
 	}
-	condition := queryCondition{}
+	condition := modelAttr.QueryCondition{}
 	fmt.Println(c.PostForm("id"))
 	fmt.Println(c.PostForm("name"))
+	fmt.Println(c.PostForm("mask"))
+	fmt.Println(c.PostForm("hat"))
+	fmt.Println(c.PostForm("glasses"))
 	fmt.Println(c.PostForm("timeStart"))
 	fmt.Println(c.PostForm("timeEnd"))
 	fmt.Println(c.PostForm("cameraID"))
@@ -62,9 +33,9 @@ func QueryFaceByCondition(c *gin.Context) {
 		return
 	}
 	fmt.Println("condition: ", condition)
-	query := mysqlFaceResult.CreateQuery()
+	query := mysqlAttrResult.CreateQuery()
 	if len(condition.CameraID) > 0 {
-		query = mysqlFaceResult.GetFaceByCameraID(query, condition.CameraID)
+		query = mysqlAttrResult.GetByCameraId(query, condition.CameraID)
 	}
 	if L1+L2 > 0 && L1*L2 != 0 {
 		var start, end time.Time
@@ -76,20 +47,36 @@ func QueryFaceByCondition(c *gin.Context) {
 			response.ResponseErrWithMsg(c, response.CodeErrRequest, "时间格式不正确")
 			return
 		}
-		query = mysqlFaceResult.GetFaceByTimeInterval(query, start, end)
+		query = mysqlAttrResult.GetByTimeInterval(query, start, end)
 	}
+	if condition.Mask == "yes" {
+		query = mysqlAttrResult.GetByMask(query, 1)
+	} else if condition.Mask == "no" {
+		query = mysqlAttrResult.GetByMask(query, 0)
+	}
+	if condition.Hat == "yes" {
+		query = mysqlAttrResult.GetByHat(query, 1)
+	} else if condition.Hat == "no" {
+		query = mysqlAttrResult.GetByHat(query, 0)
+	}
+	if condition.Glasses == "yes" {
+		query = mysqlAttrResult.GetByGlasses(query, 1)
+	} else if condition.Glasses == "no" {
+		query = mysqlAttrResult.GetByGlasses(query, 0)
+	}
+
 	if len(condition.Name) > 0 {
-		query = mysqlFaceResult.GetFaceByName(query, condition.Name)
+		query = mysqlAttrResult.GetByName(query, condition.Name)
 	}
 	if len(condition.ID) > 0 {
 		if id, err := util.ParseInt(condition.ID); err == nil {
-			query = mysqlFaceResult.GetFaceById(query, id)
+			query = mysqlAttrResult.GetById(query, id)
 		} else {
 			response.ResponseErrWithMsg(c, response.CodeErrRequest, "id字段需要为整数")
 			return
 		}
 	}
-	result := mysqlFaceResult.GetResult(query)
+	result := mysqlAttrResult.GetResult(query)
 	fmt.Println("GetResult = ", result)
 	if result == nil {
 		response.ResponseErr(c, response.CodeErrDataBase)

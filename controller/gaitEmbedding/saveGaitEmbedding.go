@@ -1,6 +1,7 @@
 package gaitEmbedding
 
 import (
+	"fmt"
 	"github.com/customs_database_server/controller/response"
 	mysqlGaitEmbedding "github.com/customs_database_server/dao/mysql/GaitEmbedding"
 	"github.com/customs_database_server/model/modelGaitEmbdding"
@@ -18,26 +19,31 @@ type requestFormat struct {
 }
 
 func SaveGaitEmbedding(c *gin.Context) {
+	fmt.Println("enter function SaveGaitEmbedding")
 	if err := c.Request.ParseMultipartForm(50 << 20); err != nil {
 		response.ResponseErr(c, response.CodeErrReQuestTooLarge)
 		return
 	}
+	fmt.Println("解析表单通过")
 	req := getReq(c)
 	if req == nil {
 		response.ResponseErr(c, response.CodeErrRequest)
 		return
 	}
+	fmt.Println("绑定json成功")
 	path := getFilePath(c)
 	if path == nil {
 		response.ResponseErrWithMsg(c, response.CodeErrRequest, "没有传输gait_img字段以及对应的文件")
 		return
 	}
+	fmt.Println("图片存储成功")
 	var modelGait modelGaitEmbdding.GaitEmbedding
 	modelGait.FaceId = &req.FaceId
 	modelGait.Name = &req.Name
 	modelGait.Embedding = &req.Embedding
 	modelGait.FaceImgURL = &req.FaceImgUrl
 	modelGait.GaitImgURL = path
+	fmt.Println(modelGait)
 	if ok := mysqlGaitEmbedding.CreateGait(&modelGait); !ok {
 		response.ResponseErr(c, response.CodeErrDataBase)
 		err := os.Remove(*path)
@@ -53,9 +59,20 @@ func SaveGaitEmbedding(c *gin.Context) {
 
 func getReq(c *gin.Context) *requestFormat {
 	var req requestFormat
-	if err := c.ShouldBindJSON(&req); err != nil {
+	req.FaceId = c.PostForm("face_id")
+	req.Name = c.PostForm("name")
+	req.Embedding = c.PostForm("embedding")
+	req.FaceImgUrl = c.PostForm("face_img_url")
+	if len(req.FaceId)*len(req.FaceImgUrl)*len(req.Name)*len(req.Embedding) == 0 {
+		fmt.Println("绑定参数失败")
 		return nil
 	}
+	//if err := c.ShouldBind(&req); err != nil {
+	//
+	//	fmt.Println("绑定参数失败")
+	//	fmt.Println(err)
+	//	return nil
+	//}
 	return &req
 }
 

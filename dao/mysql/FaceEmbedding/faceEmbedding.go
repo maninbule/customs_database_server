@@ -7,6 +7,9 @@ import (
 )
 
 func CreateFace(face *modelFaceEemdding.FaceEmbedding) bool {
+	if GetCountById(int(*face.FaceId)) >= 1 {
+		return false
+	}
 	create := config.DB.Create(face)
 	if create.Error != nil {
 		fmt.Println(create.Error)
@@ -23,4 +26,24 @@ func GetAllFace() []modelFaceEemdding.FaceEmbedding {
 		return nil
 	}
 	return allFace
+}
+
+func GetCountById(id int) int {
+	ans := 0
+	count := config.DB.Model(&modelFaceEemdding.FaceEmbedding{}).Where("faceId = ?", id).Count(&ans)
+	if count.Error != nil {
+		panic("sql执行错误[获取对应ID个数是失败]： GetCountById")
+		return 0
+	}
+	return ans
+}
+
+func GetCount() int {
+	ans := 0
+	count := config.DB.Model(&modelFaceEemdding.FaceEmbedding{}).Count(&ans)
+	if count.Error != nil {
+		panic("sql执行错误[获取对应ID个数是失败]： GetCountById")
+		return 0
+	}
+	return ans
 }

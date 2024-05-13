@@ -1,0 +1,56 @@
+basePath: /
+definitions:
+  responseModel.Face:
+    properties:
+      cameraID:
+        type: string
+      faceId:
+        type: integer
+      faceImgCorrect:
+        type: string
+      faceImgPredict:
+        type: string
+      faceTime:
+        type: string
+      name:
+        type: string
+    type: object
+host: 172.21.116.147:8082
+info:
+  contact: {}
+  description: 第一个版本
+  title: 海关项目人脸识别、步态识别、高亢伪接口文档
+  version: "1.0"
+paths:
+  /face_query:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 每个字段都可以为空，类似复选框
+      parameters:
+      - in: formData
+        name: cameraID
+        type: string
+      - in: formData
+        name: id
+        type: string
+      - in: formData
+        name: name
+        type: string
+      - in: formData
+        name: timeEnd
+        type: string
+      - in: formData
+        name: timeStart
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responseModel.Face'
+      summary: 查询接口
+      tags:
+      - 人脸识别结果
+swagger: "2.0"
