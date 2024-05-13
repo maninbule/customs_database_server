@@ -42,13 +42,13 @@ func InitRouter() *gin.Engine {
 	router.LoadHTMLGlob(filepath.Join(templatesPath, "*.html"))
 
 	router.GET("/loadImageToKafka", Controllerkafka.PushImgageToKafka)
-	fmt.Println("loadImageToKafka")
 	// 人脸结果相关url
 	router.POST("/save_face", faceResult.SaveFaceCompare)
 	router.GET("/allFace", faceResult.QueryAllFace)
 	router.GET("/faceImgDataBase/:startTime/:endTime", faceResult.QueryFaceByTime)
 	router.GET("/facepage/:left/:right", faceResult.QueryFaceByLimit)
-	router.POST("/face_query", faceResult.QueryFaceByCondition)
+	router.POST("/face_query/:page/:size", faceResult.QueryFaceByCondition)
+	router.POST("/face_query_count", faceResult.QueryFaceCountByCondition)
 	router.GET("/face_count", faceResult.GetFaceCount)
 	router.GET("/face_result_demo", demo.ShowAllFaceResult)
 	router.GET("/face_embedding_demo", demo.ShowAllFaceEmbedding)

@@ -87,6 +87,29 @@ func GetFaceById(db *gorm.DB, id int64) *gorm.DB {
 	return db.Where("faceId = ?", id)
 }
 
+func GetCountWithCondition(db *gorm.DB) int64 {
+	cnt := int64(0)
+	count := db.Count(&cnt)
+	if count.Error != nil {
+		fmt.Println("find.Error = ", count.Error)
+		return -1
+	}
+	return cnt
+}
+
+func GetResultWithLimit(db *gorm.DB, offset, limit int64) []modelFaceResult.Face {
+	faces := make([]modelFaceResult.Face, 0)
+	find := db.Offset(offset).Limit(limit).Find(&faces)
+	if find.Error != nil {
+		fmt.Println("find.Error = ", find.Error)
+		return nil
+	}
+	sort.Slice(faces, func(i, j int) bool {
+		return faces[i].FaceTime.After(*faces[j].FaceTime)
+	})
+	return faces
+}
+
 func GetResult(db *gorm.DB) []modelFaceResult.Face {
 	faces := make([]modelFaceResult.Face, 0)
 	find := db.Find(&faces)

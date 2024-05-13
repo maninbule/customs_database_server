@@ -41,8 +41,9 @@ func ParseTime(timeStr string, t *time.Time) bool {
 }
 
 func ParseInt(intStr string) (int64, error) {
-	result, err := strconv.ParseInt(intStr, 0, 0)
+	result, err := strconv.ParseInt(intStr, 10, 64)
 	if err != nil {
+		fmt.Println(result, err)
 		return 0, errors.New("int转换错误")
 	}
 	return result, nil

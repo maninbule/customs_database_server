@@ -6,6 +6,7 @@ import (
 	mysqlFaceResult "github.com/customs_database_server/dao/mysql/FaceResult"
 	"github.com/customs_database_server/util"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"time"
 )
 
@@ -43,10 +44,50 @@ type queryCondition struct {
 // @Success 200 {object} responseModel.Face
 // @Router /face_query [post]
 func QueryFaceByCondition(c *gin.Context) {
-	err2 := c.Request.ParseForm()
-	if err2 != nil {
-		response.ResponseErr(c, response.CodeErrRequest)
+	query := getQueryFromContext(c)
+	page_str := c.Param("page")
+	size_str := c.Param("size")
+	page, err1 := util.ParseInt(page_str)
+	size, err2 := util.ParseInt(size_str)
+	total := mysqlFaceResult.GetCountWithCondition(query)
+	offset := (page - 1) * size
+	limit := max(0, min(size, total-offset))
+	if query == nil || err1 != nil || err2 != nil {
 		return
+	}
+	result := mysqlFaceResult.GetResultWithLimit(query, offset, limit)
+	//result := mysqlFaceResult.GetResult(query)
+	fmt.Println("GetResult = ", result)
+	if result == nil {
+		response.ResponseErr(c, response.CodeErrDataBase)
+		return
+	} else {
+		response.ResponseOKWithData(c, result)
+		return
+	}
+}
+
+func QueryFaceCountByCondition(c *gin.Context) {
+	query := getQueryFromContext(c)
+	if query == nil {
+		return
+	}
+	result := mysqlFaceResult.GetCountWithCondition(query)
+	fmt.Println("GetResult = ", result)
+	if result == -1 {
+		response.ResponseErr(c, response.CodeErrDataBase)
+		return
+	} else {
+		response.ResponseOKWithData(c, result)
+		return
+	}
+}
+
+func getQueryFromContext(c *gin.Context) *gorm.DB {
+	err3 := c.Request.ParseForm()
+	if err3 != nil {
+		response.ResponseErr(c, response.CodeErrRequest)
+		return nil
 	}
 	condition := queryCondition{}
 	fmt.Println(c.PostForm("id"))
@@ -59,7 +100,7 @@ func QueryFaceByCondition(c *gin.Context) {
 	if err != nil || (L1+L2 > 0 && L1*L2 == 0) {
 		fmt.Println(err, L1, L2)
 		response.ResponseErrWithMsg(c, response.CodeErrRequestParamNotExisted, "时间字段不完整")
-		return
+		return nil
 	}
 	fmt.Println("condition: ", condition)
 	query := mysqlFaceResult.CreateQuery()
@@ -74,7 +115,7 @@ func QueryFaceByCondition(c *gin.Context) {
 		fmt.Println("end = ", end)
 		if !ok1 || !ok2 {
 			response.ResponseErrWithMsg(c, response.CodeErrRequest, "时间格式不正确")
-			return
+			return nil
 		}
 		query = mysqlFaceResult.GetFaceByTimeInterval(query, start, end)
 	}
@@ -86,16 +127,8 @@ func QueryFaceByCondition(c *gin.Context) {
 			query = mysqlFaceResult.GetFaceById(query, id)
 		} else {
 			response.ResponseErrWithMsg(c, response.CodeErrRequest, "id字段需要为整数")
-			return
+			return nil
 		}
 	}
-	result := mysqlFaceResult.GetResult(query)
-	fmt.Println("GetResult = ", result)
-	if result == nil {
-		response.ResponseErr(c, response.CodeErrDataBase)
-		return
-	} else {
-		response.ResponseOKWithData(c, result)
-		return
-	}
+	return query
 }
