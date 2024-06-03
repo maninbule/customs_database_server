@@ -26,24 +26,28 @@ camera_position：摄像头机位
 按照摄像头id，时间区间，名字，id依次进行过滤查询
 */
 
+// queryCondition 用于查询结果的请求参数
 type queryCondition struct {
-	ID        string `json:"id" form:"id"`
-	Name      string `json:"name" form:"name"`
-	TimeStart string `json:"timeStart" form:"timeStart"`
-	TimeEnd   string `json:"timeEnd" form:"timeEnd"`
-	CameraID  string `json:"cameraID" form:"cameraID"`
+	ID        string `json:"id" form:"id" example:"000123"`                            // ID 是一个用于查询的唯一标识符
+	Name      string `json:"name" form:"name" example:"小明"`                            // Name 是一个用于查询的姓名
+	TimeStart string `json:"timeStart" form:"timeStart" example:"2024-05-17 10:00:00"` // TimeStart 表示查询开始时间
+	TimeEnd   string `json:"timeEnd" form:"timeEnd" example:"2024-05-17 18:00:00"`     // TimeEnd 表示查询结束时间
+	CameraID  string `json:"cameraID" form:"cameraID" example:"摄像头1"`                  // CameraID 表示摄像头的唯一标识符
 }
 
 // QueryFaceByCondition 根据多种条件进行查询人脸识别结果
-// @Summary 查询接口
+// @Summary 条件查询的人脸识别结果分页查询接口
 // @Description 每个字段都可以为空，类似复选框
-// @Tags 人脸识别结果
+// @Tags 条件查询的人脸识别结果分页查询
 // @Accept application/x-www-form-urlencoded
 // @Produce application/json
+// @Param page path int true "页码"
+// @Param size path int true "每页数量"
 // @Param object formData queryCondition false "查询参数"
-// @Success 200 {object} responseModel.Face
-// @Router /face_query [post]
+// @Success 200 {object} []responseModel.Face
+// @Router /face_query/:page/:size [post]
 func QueryFaceByCondition(c *gin.Context) {
+	fmt.Println("进入了函数: QueryFaceByCondition")
 	query := getQueryFromContext(c)
 	page_str := c.Param("page")
 	size_str := c.Param("size")
@@ -56,13 +60,10 @@ func QueryFaceByCondition(c *gin.Context) {
 		return
 	}
 	result := mysqlFaceResult.GetResultWithLimit(query, offset, limit)
-	for i, _ := range result {
-		err1 := result[i].ConvertUTCtoLocalTime("Asia/Shanghai")
-		if err1 != nil {
-			response.ResponseErr(c, response.CodeErrServerErr)
-		}
+	if result == nil {
+		response.ResponseErr(c, response.CodeErrDataBase)
+		return
 	}
-	//result := mysqlFaceResult.GetResult(query)
 	fmt.Println("GetResult = ", result)
 	if result == nil {
 		response.ResponseErr(c, response.CodeErrDataBase)
@@ -73,6 +74,15 @@ func QueryFaceByCondition(c *gin.Context) {
 	}
 }
 
+// QueryFaceCountByCondition 根据多种条件进行查询人脸识别结果
+// @Summary 条件查询的人脸识别结果个数查询接口
+// @Description 每个字段都可以为空，类似复选框
+// @Tags 条件查询的人脸识别结果个数查询
+// @Accept application/x-www-form-urlencoded
+// @Produce application/json
+// @Param object formData queryCondition false "查询参数"
+// @Success 200 {object} int
+// @Router /face_query_count [post]
 func QueryFaceCountByCondition(c *gin.Context) {
 	query := getQueryFromContext(c)
 	if query == nil {

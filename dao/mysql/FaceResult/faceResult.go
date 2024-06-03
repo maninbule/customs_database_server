@@ -105,6 +105,15 @@ func GetResultWithLimit(db *gorm.DB, offset, limit int64) []modelFaceResult.Face
 		fmt.Println("find.Error = ", find.Error)
 		return nil
 	}
+	fmt.Println("将时间进行转换")
+	for i, _ := range faces {
+		err := faces[i].ConvertUTCtoLocalTime("Asia/Shanghai")
+		fmt.Println("faces[i].ConvertUTCtoLocalTime = ", faces[i].FaceTime)
+		if err != nil {
+			fmt.Println("faces[i].ConvertUTCtoLocalTime = ", err)
+			return nil
+		}
+	}
 	sort.Slice(faces, func(i, j int) bool {
 		return faces[i].FaceTime.After(*faces[j].FaceTime)
 	})
@@ -117,6 +126,13 @@ func GetResult(db *gorm.DB) []modelFaceResult.Face {
 	if find.Error != nil {
 		fmt.Println("find.Error = ", find.Error)
 		return nil
+	}
+	for i, _ := range faces {
+		err := faces[i].ConvertUTCtoLocalTime("Asia/Shanghai")
+		if err != nil {
+			fmt.Println("faces[i].ConvertUTCtoLocalTime = ", err)
+			return nil
+		}
 	}
 	sort.Slice(faces, func(i, j int) bool {
 		return faces[i].FaceTime.After(*faces[j].FaceTime)

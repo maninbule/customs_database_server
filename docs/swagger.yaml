@@ -1,46 +1,120 @@
 basePath: /
 definitions:
+  modelAttr.Attribute:
+    properties:
+      attrID:
+        description: id字段
+        type: string
+      cameraId:
+        description: 摄像头id
+        type: string
+      faceImg:
+        description: 图片url 需要加上ip:端口前缀才能访问
+        type: string
+      faceTime:
+        description: 拍摄时间
+        type: string
+      glasses:
+        description: 是否佩戴眼镜 true 或者 false
+        type: boolean
+      hat:
+        description: 是否佩戴帽子 true 或者 false
+        type: boolean
+      mask:
+        description: 是否佩戴口罩 true 或者 false
+        type: boolean
+      name:
+        description: 人员名字 保留字段，目前不使用
+        type: string
+    type: object
+  modelGaitResult.Gait:
+    properties:
+      cameraID:
+        description: 摄像头id
+        type: string
+      faceId:
+        description: id字段
+        type: string
+      faceImgURL:
+        description: 人脸图片url 需要加上ip:端口前缀才能访问
+        type: string
+      faceTime:
+        description: 拍摄时间
+        type: string
+      gaitImgURL:
+        description: 步态图片url 需要加上ip:端口前缀才能访问
+        type: string
+      name:
+        description: 姓名
+        type: string
+    type: object
   responseModel.Face:
     properties:
       cameraID:
+        description: 摄像头id
         type: string
       faceId:
+        description: 人员id
         type: integer
       faceImgCorrect:
+        description: 实际数据库照片url 需加上ip:端口前缀才可以访问
         type: string
       faceImgPredict:
+        description: 拍摄的照片url 需加上ip:端口前缀才可以访问
         type: string
       faceTime:
+        description: 拍摄时间
         type: string
       name:
+        description: 姓名
         type: string
     type: object
 host: 172.21.116.147:8082
 info:
   contact: {}
   description: 第一个版本
-  title: 海关项目人脸识别、步态识别、高亢伪接口文档
+  title: 海关项目人脸识别、步态识别、高抗伪接口文档
   version: "1.0"
 paths:
-  /face_query:
+  /face_query/:page/:size:
     post:
       consumes:
       - application/x-www-form-urlencoded
       description: 每个字段都可以为空，类似复选框
       parameters:
-      - in: formData
+      - description: 页码
+        in: path
+        name: page
+        required: true
+        type: integer
+      - description: 每页数量
+        in: path
+        name: size
+        required: true
+        type: integer
+      - description: CameraID 表示摄像头的唯一标识符
+        example: 摄像头1
+        in: formData
         name: cameraID
         type: string
-      - in: formData
+      - description: ID 是一个用于查询的唯一标识符
+        example: "000123"
+        in: formData
         name: id
         type: string
-      - in: formData
+      - description: Name 是一个用于查询的姓名
+        example: 小明
+        in: formData
         name: name
         type: string
-      - in: formData
+      - description: TimeEnd 表示查询结束时间
+        example: "2024-05-17 18:00:00"
+        in: formData
         name: timeEnd
         type: string
-      - in: formData
+      - description: TimeStart 表示查询开始时间
+        example: "2024-05-17 10:00:00"
+        in: formData
         name: timeStart
         type: string
       produces:
@@ -49,8 +123,269 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responseModel.Face'
-      summary: 查询接口
+            items:
+              $ref: '#/definitions/responseModel.Face'
+            type: array
+      summary: 条件查询的人脸识别结果分页查询接口
       tags:
-      - 人脸识别结果
+      - 条件查询的人脸识别结果分页查询
+  /face_query_count:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 每个字段都可以为空，类似复选框
+      parameters:
+      - description: CameraID 表示摄像头的唯一标识符
+        example: 摄像头1
+        in: formData
+        name: cameraID
+        type: string
+      - description: ID 是一个用于查询的唯一标识符
+        example: "000123"
+        in: formData
+        name: id
+        type: string
+      - description: Name 是一个用于查询的姓名
+        example: 小明
+        in: formData
+        name: name
+        type: string
+      - description: TimeEnd 表示查询结束时间
+        example: "2024-05-17 18:00:00"
+        in: formData
+        name: timeEnd
+        type: string
+      - description: TimeStart 表示查询开始时间
+        example: "2024-05-17 10:00:00"
+        in: formData
+        name: timeStart
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: 条件查询的人脸识别结果个数查询接口
+      tags:
+      - 条件查询的人脸识别结果个数查询
+  /query_attr_result/:page/:size:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 每个字段都可以为空，类似复选框
+      parameters:
+      - description: 页码
+        in: path
+        name: page
+        required: true
+        type: integer
+      - description: 每页数量
+        in: path
+        name: size
+        required: true
+        type: integer
+      - description: CameraID 表示摄像头的唯一标识符
+        example: 摄像头1
+        in: formData
+        name: cameraID
+        type: string
+      - description: Glasses 表示是否戴眼镜，可选值为 "true" 或 "false"
+        example: "true"
+        in: formData
+        name: glasses
+        type: string
+      - description: Hat 表示是否戴帽子，可选值为 "true" 或 "false"
+        example: "false"
+        in: formData
+        name: hat
+        type: string
+      - description: ID 是一个用于查询的唯一标识符
+        example: "123"
+        in: formData
+        name: id
+        type: string
+      - description: Mask 表示是否戴口罩，可选值为 "true" 或 "false"
+        example: "true"
+        in: formData
+        name: mask
+        type: string
+      - description: Name 是一个用于查询的姓名
+        example: 小明
+        in: formData
+        name: name
+        type: string
+      - description: TimeEnd 表示查询结束时间
+        example: "2024-05-17 18:00:00"
+        in: formData
+        name: timeEnd
+        type: string
+      - description: TimeStart 表示查询开始时间
+        example: "2024-05-17 10:00:00"
+        in: formData
+        name: timeStart
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/modelAttr.Attribute'
+            type: array
+      summary: 伪装识别结果查询接口
+      tags:
+      - 伪装识别结果分页查询
+  /query_count_with_condition:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 每个字段都可以为空，类似复选框
+      parameters:
+      - description: CameraID 表示摄像头的唯一标识符
+        example: 摄像头1
+        in: formData
+        name: cameraID
+        type: string
+      - description: Glasses 表示是否戴眼镜，可选值为 "true" 或 "false"
+        example: "true"
+        in: formData
+        name: glasses
+        type: string
+      - description: Hat 表示是否戴帽子，可选值为 "true" 或 "false"
+        example: "false"
+        in: formData
+        name: hat
+        type: string
+      - description: ID 是一个用于查询的唯一标识符
+        example: "123"
+        in: formData
+        name: id
+        type: string
+      - description: Mask 表示是否戴口罩，可选值为 "true" 或 "false"
+        example: "true"
+        in: formData
+        name: mask
+        type: string
+      - description: Name 是一个用于查询的姓名
+        example: 小明
+        in: formData
+        name: name
+        type: string
+      - description: TimeEnd 表示查询结束时间
+        example: "2024-05-17 18:00:00"
+        in: formData
+        name: timeEnd
+        type: string
+      - description: TimeStart 表示查询开始时间
+        example: "2024-05-17 10:00:00"
+        in: formData
+        name: timeStart
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: 伪装识别结果的总个数查询接口
+      tags:
+      - 伪装识别结果个数查询
+  /query_gait_count:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 每个字段都可以为空，类似复选框
+      parameters:
+      - description: CameraID 表示摄像头的唯一标识符
+        example: camera123
+        in: formData
+        name: cameraID
+        type: string
+      - description: ID 是一个用于查询的唯一标识符
+        example: "123"
+        in: formData
+        name: id
+        type: string
+      - description: Name 是一个用于查询的姓名
+        example: 小明
+        in: formData
+        name: name
+        type: string
+      - description: TimeEnd 表示查询结束时间
+        example: "2024-05-17 18:00:00"
+        in: formData
+        name: timeEnd
+        type: string
+      - description: TimeStart 表示查询开始时间
+        example: "2024-05-17 10:00:00"
+        in: formData
+        name: timeStart
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: 条件查询的步态识别结果个数查询接口
+      tags:
+      - 条件查询的步态识别结果个数查询
+  /query_gait_result/:page/:size:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 每个字段都可以为空，类似复选框
+      parameters:
+      - description: 页码
+        in: path
+        name: page
+        required: true
+        type: integer
+      - description: 每页数量
+        in: path
+        name: size
+        required: true
+        type: integer
+      - description: CameraID 表示摄像头的唯一标识符
+        example: camera123
+        in: formData
+        name: cameraID
+        type: string
+      - description: ID 是一个用于查询的唯一标识符
+        example: "123"
+        in: formData
+        name: id
+        type: string
+      - description: Name 是一个用于查询的姓名
+        example: 小明
+        in: formData
+        name: name
+        type: string
+      - description: TimeEnd 表示查询结束时间
+        example: "2024-05-17 18:00:00"
+        in: formData
+        name: timeEnd
+        type: string
+      - description: TimeStart 表示查询开始时间
+        example: "2024-05-17 10:00:00"
+        in: formData
+        name: timeStart
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/modelGaitResult.Gait'
+            type: array
+      summary: 条件查询的步态识别结果分页查询接口
+      tags:
+      - 条件查询的步态识别结果分页查询
 swagger: "2.0"

@@ -65,12 +65,14 @@ func InitRouter() *gin.Engine {
 
 	// 步态识别结果url
 	router.POST("/create_gait_result", gaitResult.CreateGaitResult)
-	router.POST("/query_gait_result", gaitResult.QueryFaceByCondition)
+	router.POST("/query_gait_result/:page/:size", gaitResult.QueryFaceByCondition)
+	router.POST("/query_gait_count", gaitResult.GetCountWithCondition)
 	router.GET("/gait_count", gaitResult.Getcount)
 
 	// 高抗伪相关url
 	router.POST("/create_attr_result", AttrResult.SaveAttr)
-	router.POST("/query_attr_result", AttrResult.QueryFaceByCondition)
+	router.POST("/query_attr_result/:page/:size", AttrResult.QueryFaceByCondition)
+	router.POST("/query_count_with_condition", AttrResult.QueryCountByCondition)
 	// 文件服务器，文件全部存储在static目录
 	router.Static("/face_img/", "static")
 	router.GET("/swagger/*any", gs.WrapHandler(swaggerFiles.Handler))

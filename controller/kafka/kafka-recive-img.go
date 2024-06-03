@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 )
 
 func GetImgFromKafka() {
@@ -52,7 +53,9 @@ func GetImgFromKafka() {
 			// 将消息数据保存为图片文件
 			path := "static/tmp/face.jpg"
 			err = ioutil.WriteFile(path, msg.Value, os.ModePerm)
-			faceResult.FaceRecognize("1", "2024-05-09 00:00:00", path)
+			currentTime := time.Now()
+			formattedTime := currentTime.Format("2006-01-02 15:04:05")
+			faceResult.FaceRecognize("1", formattedTime, path)
 			AttrResult.AttrRecognize("1", path)
 			if err != nil {
 				log.Fatalf("Failed to write image file: %v", err)

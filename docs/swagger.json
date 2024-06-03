@@ -2,14 +2,14 @@
     "swagger": "2.0",
     "info": {
         "description": "第一个版本",
-        "title": "海关项目人脸识别、步态识别、高亢伪接口文档",
+        "title": "海关项目人脸识别、步态识别、高抗伪接口文档",
         "contact": {},
         "version": "1.0"
     },
     "host": "172.21.116.147:8082",
     "basePath": "/",
     "paths": {
-        "/face_query": {
+        "/face_query/:page/:size": {
             "post": {
                 "description": "每个字段都可以为空，类似复选框",
                 "consumes": [
@@ -19,32 +19,56 @@
                     "application/json"
                 ],
                 "tags": [
-                    "人脸识别结果"
+                    "条件查询的人脸识别结果分页查询"
                 ],
-                "summary": "查询接口",
+                "summary": "条件查询的人脸识别结果分页查询接口",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "type": "string",
+                        "example": "摄像头1",
+                        "description": "CameraID 表示摄像头的唯一标识符",
                         "name": "cameraID",
                         "in": "formData"
                     },
                     {
                         "type": "string",
+                        "example": "000123",
+                        "description": "ID 是一个用于查询的唯一标识符",
                         "name": "id",
                         "in": "formData"
                     },
                     {
                         "type": "string",
+                        "example": "小明",
+                        "description": "Name 是一个用于查询的姓名",
                         "name": "name",
                         "in": "formData"
                     },
                     {
                         "type": "string",
+                        "example": "2024-05-17 18:00:00",
+                        "description": "TimeEnd 表示查询结束时间",
                         "name": "timeEnd",
                         "in": "formData"
                     },
                     {
                         "type": "string",
+                        "example": "2024-05-17 10:00:00",
+                        "description": "TimeStart 表示查询开始时间",
                         "name": "timeStart",
                         "in": "formData"
                     }
@@ -53,7 +77,386 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responseModel.Face"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responseModel.Face"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/face_query_count": {
+            "post": {
+                "description": "每个字段都可以为空，类似复选框",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "条件查询的人脸识别结果个数查询"
+                ],
+                "summary": "条件查询的人脸识别结果个数查询接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "摄像头1",
+                        "description": "CameraID 表示摄像头的唯一标识符",
+                        "name": "cameraID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "000123",
+                        "description": "ID 是一个用于查询的唯一标识符",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "小明",
+                        "description": "Name 是一个用于查询的姓名",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-05-17 18:00:00",
+                        "description": "TimeEnd 表示查询结束时间",
+                        "name": "timeEnd",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-05-17 10:00:00",
+                        "description": "TimeStart 表示查询开始时间",
+                        "name": "timeStart",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/query_attr_result/:page/:size": {
+            "post": {
+                "description": "每个字段都可以为空，类似复选框",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "伪装识别结果分页查询"
+                ],
+                "summary": "伪装识别结果查询接口",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "摄像头1",
+                        "description": "CameraID 表示摄像头的唯一标识符",
+                        "name": "cameraID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "true",
+                        "description": "Glasses 表示是否戴眼镜，可选值为 \"true\" 或 \"false\"",
+                        "name": "glasses",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "false",
+                        "description": "Hat 表示是否戴帽子，可选值为 \"true\" 或 \"false\"",
+                        "name": "hat",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "123",
+                        "description": "ID 是一个用于查询的唯一标识符",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "true",
+                        "description": "Mask 表示是否戴口罩，可选值为 \"true\" 或 \"false\"",
+                        "name": "mask",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "小明",
+                        "description": "Name 是一个用于查询的姓名",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-05-17 18:00:00",
+                        "description": "TimeEnd 表示查询结束时间",
+                        "name": "timeEnd",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-05-17 10:00:00",
+                        "description": "TimeStart 表示查询开始时间",
+                        "name": "timeStart",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/modelAttr.Attribute"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/query_count_with_condition": {
+            "post": {
+                "description": "每个字段都可以为空，类似复选框",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "伪装识别结果个数查询"
+                ],
+                "summary": "伪装识别结果的总个数查询接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "摄像头1",
+                        "description": "CameraID 表示摄像头的唯一标识符",
+                        "name": "cameraID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "true",
+                        "description": "Glasses 表示是否戴眼镜，可选值为 \"true\" 或 \"false\"",
+                        "name": "glasses",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "false",
+                        "description": "Hat 表示是否戴帽子，可选值为 \"true\" 或 \"false\"",
+                        "name": "hat",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "123",
+                        "description": "ID 是一个用于查询的唯一标识符",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "true",
+                        "description": "Mask 表示是否戴口罩，可选值为 \"true\" 或 \"false\"",
+                        "name": "mask",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "小明",
+                        "description": "Name 是一个用于查询的姓名",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-05-17 18:00:00",
+                        "description": "TimeEnd 表示查询结束时间",
+                        "name": "timeEnd",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-05-17 10:00:00",
+                        "description": "TimeStart 表示查询开始时间",
+                        "name": "timeStart",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/query_gait_count": {
+            "post": {
+                "description": "每个字段都可以为空，类似复选框",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "条件查询的步态识别结果个数查询"
+                ],
+                "summary": "条件查询的步态识别结果个数查询接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "camera123",
+                        "description": "CameraID 表示摄像头的唯一标识符",
+                        "name": "cameraID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "123",
+                        "description": "ID 是一个用于查询的唯一标识符",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "小明",
+                        "description": "Name 是一个用于查询的姓名",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-05-17 18:00:00",
+                        "description": "TimeEnd 表示查询结束时间",
+                        "name": "timeEnd",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-05-17 10:00:00",
+                        "description": "TimeStart 表示查询开始时间",
+                        "name": "timeStart",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/query_gait_result/:page/:size": {
+            "post": {
+                "description": "每个字段都可以为空，类似复选框",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "条件查询的步态识别结果分页查询"
+                ],
+                "summary": "条件查询的步态识别结果分页查询接口",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "camera123",
+                        "description": "CameraID 表示摄像头的唯一标识符",
+                        "name": "cameraID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "123",
+                        "description": "ID 是一个用于查询的唯一标识符",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "小明",
+                        "description": "Name 是一个用于查询的姓名",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-05-17 18:00:00",
+                        "description": "TimeEnd 表示查询结束时间",
+                        "name": "timeEnd",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-05-17 10:00:00",
+                        "description": "TimeStart 表示查询开始时间",
+                        "name": "timeStart",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/modelGaitResult.Gait"
+                            }
                         }
                     }
                 }
@@ -61,25 +464,97 @@
         }
     },
     "definitions": {
+        "modelAttr.Attribute": {
+            "type": "object",
+            "properties": {
+                "attrID": {
+                    "description": "id字段",
+                    "type": "string"
+                },
+                "cameraId": {
+                    "description": "摄像头id",
+                    "type": "string"
+                },
+                "faceImg": {
+                    "description": "图片url 需要加上ip:端口前缀才能访问",
+                    "type": "string"
+                },
+                "faceTime": {
+                    "description": "拍摄时间",
+                    "type": "string"
+                },
+                "glasses": {
+                    "description": "是否佩戴眼镜 true 或者 false",
+                    "type": "boolean"
+                },
+                "hat": {
+                    "description": "是否佩戴帽子 true 或者 false",
+                    "type": "boolean"
+                },
+                "mask": {
+                    "description": "是否佩戴口罩 true 或者 false",
+                    "type": "boolean"
+                },
+                "name": {
+                    "description": "人员名字 保留字段，目前不使用",
+                    "type": "string"
+                }
+            }
+        },
+        "modelGaitResult.Gait": {
+            "type": "object",
+            "properties": {
+                "cameraID": {
+                    "description": "摄像头id",
+                    "type": "string"
+                },
+                "faceId": {
+                    "description": "id字段",
+                    "type": "string"
+                },
+                "faceImgURL": {
+                    "description": "人脸图片url 需要加上ip:端口前缀才能访问",
+                    "type": "string"
+                },
+                "faceTime": {
+                    "description": "拍摄时间",
+                    "type": "string"
+                },
+                "gaitImgURL": {
+                    "description": "步态图片url 需要加上ip:端口前缀才能访问",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "姓名",
+                    "type": "string"
+                }
+            }
+        },
         "responseModel.Face": {
             "type": "object",
             "properties": {
                 "cameraID": {
+                    "description": "摄像头id",
                     "type": "string"
                 },
                 "faceId": {
+                    "description": "人员id",
                     "type": "integer"
                 },
                 "faceImgCorrect": {
+                    "description": "实际数据库照片url 需加上ip:端口前缀才可以访问",
                     "type": "string"
                 },
                 "faceImgPredict": {
+                    "description": "拍摄的照片url 需加上ip:端口前缀才可以访问",
                     "type": "string"
                 },
                 "faceTime": {
+                    "description": "拍摄时间",
                     "type": "string"
                 },
                 "name": {
+                    "description": "姓名",
                     "type": "string"
                 }
             }

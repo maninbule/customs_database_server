@@ -13,12 +13,13 @@ import (
 )
 
 type requestFormat struct {
-	FaceId         string `json:"face_id"`
-	Name           string `json:"name"`
-	FaceTime       string `json:"face_Time"`
-	FaceImgCorrect string `json:"face_Img_correct"`
-	FaceImgPredict string `json:"face_Img_predict"`
-	CameraID       string `json:"camera_id"`
+	FaceId         string  `json:"face_id"`
+	Name           string  `json:"name"`
+	FaceTime       string  `json:"face_Time"`
+	FaceImgCorrect string  `json:"face_Img_correct"`
+	FaceImgPredict string  `json:"face_Img_predict"`
+	CameraID       string  `json:"camera_id"`
+	Accuracy       float32 `json:"accuracy"`
 }
 
 func (r requestFormat) Valid() bool {
@@ -53,6 +54,7 @@ func (r requestFormat) getTime() (time.Time, error) {
 }
 
 func SaveFaceCompare(c *gin.Context) {
+	fmt.Println("进入了函数SaveFaceCompare")
 	err := c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
 		response.ResponseErr(c, response.CodeErrReQuestTooLarge)
@@ -75,6 +77,14 @@ func SaveFaceCompare(c *gin.Context) {
 	jsonFormat.Name = c.PostForm("name")
 	jsonFormat.FaceTime = c.PostForm("face_Time")
 	jsonFormat.CameraID = c.PostForm("camera_id")
+	//jsonFormat.Accuracy = c.PostForm("accuracy")
+	fmt.Println(c.PostForm("accuracy"))
+	accuracy, err := strconv.ParseFloat(c.PostForm("accuracy"), 32)
+	if err != nil {
+		response.ResponseErr(c, response.CodeErrRequestParamNotExisted)
+		return
+	}
+	jsonFormat.Accuracy = float32(accuracy)
 	jsonFormat.FaceImgCorrect = pathCorrectImg
 	jsonFormat.FaceImgPredict = pathPredictImg
 	if !jsonFormat.Valid() {
@@ -105,9 +115,9 @@ func CreateFace(c *gin.Context, jsonFormat *requestFormat) bool {
 	face.FaceImgCorrect = &jsonFormat.FaceImgCorrect
 	face.FaceImgPredict = &jsonFormat.FaceImgPredict
 	face.CameraID = &jsonFormat.CameraID
+	face.Accuracy = &jsonFormat.Accuracy
 	t, _ := jsonFormat.getTime()
-	addTime := t.Add(-8 * time.Hour)
-	face.FaceTime = &addTime
+	face.FaceTime = &t
 	ok := mysqlFaceResult.CreateFace(&face)
 	return ok
 }

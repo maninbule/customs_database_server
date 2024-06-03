@@ -17,6 +17,7 @@ type Face struct {
 	CameraID       *string    `gorm:"column:cameraID;not null;omitempty" json:"cameraID"`
 	FaceImgCorrect *string    `gorm:"column:faceImgCorrect;type:varchar(255);not null;omitempty" json:"faceImgCorrect"`
 	FaceImgPredict *string    `gorm:"column:faceImgPredict;type:varchar(255);not null;omitempty" json:"faceImgPredict"`
+	Accuracy       *float32   `gorm:"column:accuracy;type:float;not null;omitempty" json:"Accuracy"`
 }
 
 // 前端使用
@@ -43,12 +44,14 @@ type RedisOutFaceResult struct {
 	CameraID       string
 	FaceImgCorrect []byte
 	FaceImgPredict []byte
+	Accuracy       float32
 }
 
 func Convert(r *RedisOutFaceResult) (*Face, error) {
 	var res Face
 	res.Name = &r.Name
 	res.CameraID = &r.CameraID
+	res.Accuracy = &r.Accuracy
 	toTime, err := util.StringToTime(r.FaceTime)
 	if err != nil {
 		return nil, err

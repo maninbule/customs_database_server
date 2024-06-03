@@ -9,9 +9,9 @@ import (
 )
 
 func CreateAttr(attr *modelAttr.Attribute) bool {
+	attr.BeforeSave()
 	create := config.DB.Create(attr)
 	if create.Error != nil {
-		fmt.Println(create.Error)
 		return false
 	}
 	return true
@@ -68,11 +68,29 @@ func GetById(db *gorm.DB, id int64) *gorm.DB {
 	return db.Where("face_id = ?", id)
 }
 
-func GetResult(db *gorm.DB) []modelAttr.Attribute {
-	gaits := make([]modelAttr.Attribute, 0)
-	find := db.Find(&gaits)
+func GetResultWithLimit(db *gorm.DB, offset, limit int64) []modelAttr.Attribute {
+	attrs := make([]modelAttr.Attribute, 0)
+	find := db.Offset(offset).Limit(limit).Find(&attrs)
 	if find.Error != nil {
+		fmt.Println("Error = ", find.Error)
 		return nil
 	}
-	return gaits
+	for i, _ := range attrs {
+		err := attrs[i].ConvertUTCtoLocalTime("Asia/Shanghai")
+		if err != nil {
+			fmt.Println("attrs[i].ConvertUTCtoLocalTime err = ", err)
+			return nil
+		}
+	}
+	return attrs
+}
+
+func GetResultCount(db *gorm.DB) int64 {
+	var ans int64
+	count := db.Count(&ans)
+	if count.Error != nil {
+		fmt.Println("Error = ", count.Error)
+		return -1
+	}
+	return ans
 }

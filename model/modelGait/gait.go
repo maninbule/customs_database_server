@@ -9,13 +9,13 @@ import (
 )
 
 type Gait struct {
-	gorm.Model
-	FaceId     *string    `gorm:"column:face_id type:int unsigned;not null;omitempty"`
-	Name       *string    `gorm:"column:name;type:varchar(50);not null;omitempty"`
-	CameraID   *string    `gorm:"column:camera_id;not null;omitempty"`
-	FaceTime   *time.Time `gorm:"column:face_time;not null;omitempty"`
-	FaceImgURL *string    `gorm:"column:face_img_url;type:varchar(255);not null;omitempty"`
-	GaitImgURL *string    `gorm:"column:gait_img_url;type:varchar(255);not null;omitempty"`
+	gorm.Model `json:"-"`
+	FaceId     *string    `gorm:"column:face_id type:int unsigned;not null;omitempty"`      // id字段
+	Name       *string    `gorm:"column:name;type:varchar(50);not null;omitempty"`          // 姓名
+	CameraID   *string    `gorm:"column:camera_id;not null;omitempty"`                      // 摄像头id
+	FaceTime   *time.Time `gorm:"column:face_time;not null;omitempty"`                      // 拍摄时间
+	FaceImgURL *string    `gorm:"column:face_img_url;type:varchar(255);not null;omitempty"` // 人脸图片url 需要加上ip:端口前缀才能访问
+	GaitImgURL *string    `gorm:"column:gait_img_url;type:varchar(255);not null;omitempty"` // 步态图片url 需要加上ip:端口前缀才能访问
 }
 
 // 请求参数
@@ -52,6 +52,24 @@ func ConvertGaitRequestToGait(g *GaitRequest) (*Gait, bool) {
 	}
 	res.GaitImgURL = &path
 	return &res, true
+}
+
+// BeforeSave hook to set FaceTime to UTC before saving to database
+func (gait *Gait) BeforeSave() (err error) {
+	if gait.FaceTime != nil {
+		*gait.FaceTime = gait.FaceTime.UTC()
+	}
+	return nil
+}
+
+func (g *Gait) ConvertUTCtoLocalTime(location string) error {
+	loc, err := time.LoadLocation(location)
+	if err != nil {
+		return err
+	}
+	t := g.FaceTime.In(loc)
+	g.FaceTime = &t
+	return nil
 }
 
 //

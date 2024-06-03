@@ -1,6 +1,7 @@
 package response
 
 import (
+	"github.com/customs_database_server/model/modelAttr"
 	"github.com/customs_database_server/model/modelFace"
 	"github.com/customs_database_server/model/modelFaceEemdding"
 	"github.com/customs_database_server/model/modelGait"
@@ -67,6 +68,8 @@ func ResponseOKWithData(c *gin.Context, data interface{}) {
 	case []modelGaitEmbdding.GaitEmbedding:
 		length = len(v)
 	case []modelGaitResult.Gait:
+		length = len(v)
+	case []modelAttr.Attribute:
 		length = len(v)
 	default:
 		length = 1
