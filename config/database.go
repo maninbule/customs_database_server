@@ -1,8 +1,10 @@
 package config
 
+// 这是在main分支上的代码
+import "github.com/jinzhu/gorm"
+
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
