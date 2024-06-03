@@ -1,6 +1,6 @@
 package config
 
-// 这是在main分支上的代码
+// 这是在v2分支上的代码
 import "github.com/jinzhu/gorm"
 
 import (
