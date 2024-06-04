@@ -3,9 +3,9 @@ package logicfaceEmbedding
 import (
 	"bufio"
 	"fmt"
-	mysqlFaceEmbedding "github.com/customs_database_server/dao/mysql/FaceEmbedding"
-	redisFaceEmbedding "github.com/customs_database_server/dao/redis/faceEmbedding"
-	"github.com/customs_database_server/model/modelFaceEemdding"
+	"github.com/customs_database_server/internal/dao/mysql/FaceEmbedding"
+	"github.com/customs_database_server/internal/dao/redis/faceEmbedding"
+	"github.com/customs_database_server/internal/model/modelFaceEemdding"
 	"github.com/gin-gonic/gin"
 	"io"
 	"os"

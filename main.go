@@ -8,22 +8,22 @@ package main
 // @BasePath /
 
 import (
-	"fmt"
-	"github.com/customs_database_server/config"
-	Controllerkafka "github.com/customs_database_server/controller/kafka"
-	"github.com/customs_database_server/model"
-	"github.com/customs_database_server/router"
+	"github.com/customs_database_server/global"
+	"github.com/customs_database_server/internal/router"
 )
 
 func main() {
-	config.InitDB() // 初始化数据库
-	config.InitRedis()
-	fmt.Println("connect database successful...version 4")
-	model.InitModel() // 初始化数据库表
-	fmt.Println("build face database")
-	fmt.Println("finish face database")
-	go func() {
-		Controllerkafka.GetImgFromKafka() // 不断从kafka接收图片，进行识别
-	}()
+	global.SetupSetting() // 读取并解析配置文件
+	global.InitDBEngine() // 初始化数据库
+	global.InitLogger()   // 初始化日志记录器
+	//config.InitRedis()
+	//fmt.Println("connect database successful...version 4")
+	//model.InitModel() // 初始化数据库表
+	//fmt.Println("build face database")
+	//fmt.Println("finish face database")
+	//go func() {
+	//	Controllerkafka.GetImgFromKafka() // 不断从kafka接收图片，进行识别
+	//}()
+	global.Logger.Info("日志记录器，初始化成功")
 	router.InitRouter() // 初始化路由
 }
