@@ -2,7 +2,7 @@ package mysqlFaceEmbedding
 
 import (
 	"fmt"
-	"github.com/customs_database_server/config"
+	"github.com/customs_database_server/global"
 	"github.com/customs_database_server/internal/model/modelFaceEemdding"
 )
 
@@ -10,7 +10,7 @@ func CreateFace(face *modelFaceEemdding.FaceEmbedding) bool {
 	if GetCountById(int(*face.FaceId)) >= 1 {
 		return false
 	}
-	create := config.DB.Create(face)
+	create := global.DB.Create(face)
 	if create.Error != nil {
 		fmt.Println(create.Error)
 		return false
@@ -20,7 +20,7 @@ func CreateFace(face *modelFaceEemdding.FaceEmbedding) bool {
 
 func GetAllFace() []modelFaceEemdding.FaceEmbedding {
 	allFace := make([]modelFaceEemdding.FaceEmbedding, 0)
-	find := config.DB.Model(&modelFaceEemdding.FaceEmbedding{}).Find(&allFace)
+	find := global.DB.Model(&modelFaceEemdding.FaceEmbedding{}).Find(&allFace)
 	if find.Error != nil {
 		panic("sql执行错误[获取人脸向量数据失败]： GetallFace")
 		return nil
@@ -30,7 +30,7 @@ func GetAllFace() []modelFaceEemdding.FaceEmbedding {
 
 func GetCountById(id int) int {
 	ans := 0
-	count := config.DB.Model(&modelFaceEemdding.FaceEmbedding{}).Where("faceId = ?", id).Count(&ans)
+	count := global.DB.Model(&modelFaceEemdding.FaceEmbedding{}).Where("faceId = ?", id).Count(&ans)
 	if count.Error != nil {
 		panic("sql执行错误[获取对应ID个数是失败]： GetCountById")
 		return 0
@@ -40,7 +40,7 @@ func GetCountById(id int) int {
 
 func GetCount() int {
 	ans := 0
-	count := config.DB.Model(&modelFaceEemdding.FaceEmbedding{}).Count(&ans)
+	count := global.DB.Model(&modelFaceEemdding.FaceEmbedding{}).Count(&ans)
 	if count.Error != nil {
 		panic("sql执行错误[获取对应ID个数是失败]： GetCountById")
 		return 0

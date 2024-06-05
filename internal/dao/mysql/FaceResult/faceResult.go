@@ -2,7 +2,7 @@ package mysqlFaceResult
 
 import (
 	"fmt"
-	"github.com/customs_database_server/config"
+	"github.com/customs_database_server/global"
 	"github.com/customs_database_server/internal/model/modelFace"
 	"github.com/jinzhu/gorm"
 	"sort"
@@ -14,7 +14,7 @@ func CreateFace(face *modelFaceResult.Face) bool {
 	//	return false
 	//}
 	face.BeforeSave()
-	create := config.DB.Create(face)
+	create := global.DB.Create(face)
 	if create.Error != nil {
 		fmt.Println(create.Error)
 		return false
@@ -24,7 +24,7 @@ func CreateFace(face *modelFaceResult.Face) bool {
 
 func GetAllFace() []modelFaceResult.Face {
 	allFace := make([]modelFaceResult.Face, 0)
-	query := config.DB.Model(&modelFaceResult.Face{}).Find(&allFace)
+	query := global.DB.Model(&modelFaceResult.Face{}).Find(&allFace)
 	if query.Error != nil {
 		panic("sql执行错误[获取人脸数据失败]")
 	}
@@ -33,7 +33,7 @@ func GetAllFace() []modelFaceResult.Face {
 
 func GetFaceByTime(startDate, endDate time.Time) []modelFaceResult.Face {
 	allFace := make([]modelFaceResult.Face, 0)
-	query := config.DB.Model(&modelFaceResult.Face{}).Where("faceTime between ? and ?", startDate, endDate).Find(&allFace)
+	query := global.DB.Model(&modelFaceResult.Face{}).Where("faceTime between ? and ?", startDate, endDate).Find(&allFace)
 	if query.Error != nil {
 		panic("sql执行错误[获取指定日期人脸数据失败]")
 	}
@@ -42,7 +42,7 @@ func GetFaceByTime(startDate, endDate time.Time) []modelFaceResult.Face {
 
 func GetFaceByID(id int) modelFaceResult.Face {
 	face := modelFaceResult.Face{}
-	query := config.DB.Model(&modelFaceResult.Face{}).Where("id = ?", id).First(&face)
+	query := global.DB.Model(&modelFaceResult.Face{}).Where("id = ?", id).First(&face)
 	if query != nil {
 		panic("sql执行错误[根据id查询人脸失败]")
 	}
@@ -51,7 +51,7 @@ func GetFaceByID(id int) modelFaceResult.Face {
 
 func GetFaceByLR(l, r int64) []modelFaceResult.Face {
 	allFace := make([]modelFaceResult.Face, 0)
-	query := config.DB.Model(&modelFaceResult.Face{}).Offset(l - 1).Limit(r - l + 1).Find(&allFace)
+	query := global.DB.Model(&modelFaceResult.Face{}).Offset(l - 1).Limit(r - l + 1).Find(&allFace)
 	if query.Error != nil {
 		panic("sql执行错误[根据id区间查询人脸失败]")
 	}
@@ -60,7 +60,7 @@ func GetFaceByLR(l, r int64) []modelFaceResult.Face {
 
 func GetCount() int64 {
 	var cnt int64
-	query := config.DB.Model(&modelFaceResult.Face{}).Count(&cnt)
+	query := global.DB.Model(&modelFaceResult.Face{}).Count(&cnt)
 	if query.Error != nil {
 		panic("sql执行错误[查询count失败]")
 	}
@@ -68,7 +68,7 @@ func GetCount() int64 {
 }
 
 func CreateQuery() *gorm.DB {
-	return config.DB.Model(&modelFaceResult.Face{})
+	return global.DB.Model(&modelFaceResult.Face{})
 }
 
 func GetFaceByCameraID(db *gorm.DB, id string) *gorm.DB {

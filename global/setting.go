@@ -10,6 +10,8 @@ var (
 	ServerSetting   setting.ServerSettings
 	AppSetting      setting.AppSettings
 	DatabaseSetting setting.DatabaseSettings
+	RedisSetting    setting.RedisSetting
+	KafkaSetting    setting.KafkaSetting
 )
 
 func SetupSetting() {
@@ -17,11 +19,25 @@ func SetupSetting() {
 	if err != nil {
 		panic("viper配置文件没有加载成功")
 	}
-	err1 := setting.ReadSection("Server", &ServerSetting)
-	err2 := setting.ReadSection("App", &AppSetting)
-	err3 := setting.ReadSection("Database", &DatabaseSetting)
-	if err1 != nil || err2 != nil || err3 != nil {
-		panic("viper配置文件section没有读取成功")
+	err = setting.ReadSection("Server", &ServerSetting)
+	if err != nil {
+		panic("viper配置文件Server section没有读取成功")
+	}
+	err = setting.ReadSection("App", &AppSetting)
+	if err != nil {
+		panic("viper配置文件App section没有读取成功")
+	}
+	err = setting.ReadSection("Database", &DatabaseSetting)
+	if err != nil {
+		panic("viper配置文件Database section没有读取成功")
+	}
+	err = setting.ReadSection("Redis", &RedisSetting)
+	if err != nil {
+		panic("viper配置文件Redis section没有读取成功")
+	}
+	err = setting.ReadSection("Kafka", &KafkaSetting)
+	if err != nil {
+		panic("viper配置文件Kafka section没有读取成功")
 	}
 	ServerSetting.ReadTimeout *= time.Second
 	ServerSetting.WriteTimeout *= time.Second
@@ -29,4 +45,7 @@ func SetupSetting() {
 	fmt.Printf("%#v\n", ServerSetting)
 	fmt.Printf("%#v\n", AppSetting)
 	fmt.Printf("%#v\n", DatabaseSetting)
+	fmt.Printf("%#v\n", RedisSetting)
+	fmt.Printf("%#v\n", KafkaSetting)
+
 }

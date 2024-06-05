@@ -2,7 +2,7 @@ package mysqlAttrResult
 
 import (
 	"fmt"
-	"github.com/customs_database_server/config"
+	"github.com/customs_database_server/global"
 	"github.com/customs_database_server/internal/model/modelAttr"
 	"github.com/jinzhu/gorm"
 	"time"
@@ -10,7 +10,7 @@ import (
 
 func CreateAttr(attr *modelAttr.Attribute) bool {
 	attr.BeforeSave()
-	create := config.DB.Create(attr)
+	create := global.DB.Create(attr)
 	if create.Error != nil {
 		return false
 	}
@@ -19,7 +19,7 @@ func CreateAttr(attr *modelAttr.Attribute) bool {
 
 func GetAllAttr() []modelAttr.Attribute {
 	allAttr := make([]modelAttr.Attribute, 0)
-	query := config.DB.Model(&modelAttr.Attribute{}).Find(&allAttr)
+	query := global.DB.Model(&modelAttr.Attribute{}).Find(&allAttr)
 	if query.Error != nil {
 		fmt.Println("query : ", query.Error)
 		return nil
@@ -29,7 +29,7 @@ func GetAllAttr() []modelAttr.Attribute {
 
 func GetAttrByTime(startDate, endDate time.Time) []modelAttr.Attribute {
 	allAttr := make([]modelAttr.Attribute, 0)
-	query := config.DB.Model(&modelAttr.Attribute{}).Where("faceTime between ? and ?", startDate, endDate).Find(&allAttr)
+	query := global.DB.Model(&modelAttr.Attribute{}).Where("faceTime between ? and ?", startDate, endDate).Find(&allAttr)
 	if query.Error != nil {
 		fmt.Println("query : ", query.Error)
 		return nil
@@ -38,7 +38,7 @@ func GetAttrByTime(startDate, endDate time.Time) []modelAttr.Attribute {
 }
 
 func CreateQuery() *gorm.DB {
-	return config.DB.Model(&modelAttr.Attribute{})
+	return global.DB.Model(&modelAttr.Attribute{})
 }
 
 func GetByCameraId(db *gorm.DB, id string) *gorm.DB {

@@ -2,11 +2,13 @@ package global
 
 import (
 	"fmt"
+	"github.com/go-redis/redis/v8"
 	"github.com/jinzhu/gorm"
 )
 
 var (
-	DBEngine *gorm.DB
+	DB    *gorm.DB
+	Redis *redis.Client
 )
 
 func InitDBEngine() {
@@ -25,8 +27,19 @@ func InitDBEngine() {
 	if ServerSetting.RunMode == "debug" {
 		db.LogMode(true)
 	}
-	db.SingularTable(true)
+	//db.SingularTable(true)
 	db.DB().SetMaxIdleConns(DatabaseSetting.MaxIdleConns)
 	db.DB().SetMaxOpenConns(DatabaseSetting.MaxOpenConns)
-	DBEngine = db
+	DB = db
+}
+
+func InitRedis() {
+	Redis = redis.NewClient(&redis.Options{
+		Addr:     RedisSetting.Host,
+		Password: RedisSetting.Password,
+		DB:       RedisSetting.DB,
+	})
+	if Redis == nil {
+		panic("Redis初始化失败")
+	}
 }

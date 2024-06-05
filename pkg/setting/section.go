@@ -1,3 +1,4 @@
+// 每个配置文件部分的接收结构体
 package setting
 
 import "time"
@@ -27,4 +28,17 @@ type DatabaseSettings struct {
 	ParseTime    bool
 	MaxIdleConns int
 	MaxOpenConns int
+}
+
+type RedisSetting struct {
+	Host     string
+	Password string
+	DB       int
+	FacePath string
+	NamePath string
+}
+
+type KafkaSetting struct {
+	Host  string
+	Topic string
 }

@@ -13,9 +13,18 @@ Database:
   DBType: mysql
   Username: root
   Password: 123456
-  Host: 127.0.0.1:33306
+  Host: 172.21.116.147:33306
   DBName: customs
   Charset: utf8
   ParseTime: True
   MaxIdleConns: 10
   MaxOpenConns: 30
+Redis:
+  Host: 172.21.116.147:6379
+  Password:
+  DB: 0
+  FacePath: static/tmp/face
+  NamePath: static/tmp/name
+Kafka:
+  Host: 172.21.116.147:9092
+  Topic: face-images

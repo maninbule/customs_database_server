@@ -3,6 +3,7 @@ package logicfaceEmbedding
 import (
 	"bufio"
 	"fmt"
+	"github.com/customs_database_server/global"
 	"github.com/customs_database_server/internal/dao/mysql/FaceEmbedding"
 	"github.com/customs_database_server/internal/dao/redis/faceEmbedding"
 	"github.com/customs_database_server/internal/model/modelFaceEemdding"
@@ -17,8 +18,8 @@ import (
 从redis接收图像，并保存到mysql
 */
 
-const disk_path = "static/tmp/face"
-const name_path = "static/tmp/name"
+var disk_path string = global.RedisSetting.FacePath
+var name_path string = global.RedisSetting.NamePath
 
 var cnt int
 

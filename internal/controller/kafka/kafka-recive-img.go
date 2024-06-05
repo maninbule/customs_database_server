@@ -3,6 +3,7 @@ package Controllerkafka
 import (
 	"fmt"
 	"github.com/IBM/sarama"
+	"github.com/customs_database_server/global"
 	"github.com/customs_database_server/internal/controller/AttrResult"
 	"github.com/customs_database_server/internal/controller/faceResult"
 	"io/ioutil"
@@ -13,7 +14,7 @@ import (
 
 func GetImgFromKafka() {
 	// Kafka 服务器地址
-	brokerList := []string{"172.21.116.147:9092"}
+	brokerList := []string{global.KafkaSetting.Host}
 
 	// 创建 Kafka 消费者配置
 	config := sarama.NewConfig()
@@ -31,7 +32,7 @@ func GetImgFromKafka() {
 	}()
 
 	// 订阅 topic
-	topic := "face-images"
+	topic := global.KafkaSetting.Topic
 	partitionConsumer, err := consumer.ConsumePartition(topic, 0, sarama.OffsetNewest)
 	if err != nil {
 		log.Fatalf("Failed to start consumer for topic %s: %v", topic, err)

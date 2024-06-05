@@ -3,6 +3,7 @@ package Controllerkafka
 import (
 	"fmt"
 	"github.com/IBM/sarama"
+	"github.com/customs_database_server/global"
 	"github.com/customs_database_server/internal/controller/response"
 	"github.com/gin-gonic/gin"
 	"io/fs"
@@ -27,7 +28,7 @@ func visit(path string, info os.FileInfo, err error) error {
 
 func PushImgageToKafka(c *gin.Context) {
 	fmt.Println("enter function: PushImgageToKafka 111")
-	brokerList := []string{"172.21.116.147:9092"}
+	brokerList := []string{global.KafkaSetting.Host}
 
 	// 创建 Kafka 生产者配置
 	config := sarama.NewConfig()
@@ -60,7 +61,7 @@ func PushImgageToKafka(c *gin.Context) {
 
 		// 构造消息
 		message := &sarama.ProducerMessage{
-			Topic: "face-images",
+			Topic: global.KafkaSetting.Topic,
 			Value: sarama.ByteEncoder(data),
 		}
 

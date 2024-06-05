@@ -2,7 +2,7 @@ package mysqlGaitResult
 
 import (
 	"fmt"
-	"github.com/customs_database_server/config"
+	"github.com/customs_database_server/global"
 	"github.com/customs_database_server/internal/model/modelGait"
 	"github.com/jinzhu/gorm"
 	"time"
@@ -10,7 +10,7 @@ import (
 
 func CreateGait(g *modelGaitResult.Gait) bool {
 	g.BeforeSave()
-	create := config.DB.Create(g)
+	create := global.DB.Create(g)
 	if create.Error != nil {
 		panic("数据库存储错误 CreateGait")
 		return false
@@ -20,7 +20,7 @@ func CreateGait(g *modelGaitResult.Gait) bool {
 
 func GaitCount() int64 {
 	var cnt int64
-	count := config.DB.Model(&modelGaitResult.Gait{}).Count(&cnt)
+	count := global.DB.Model(&modelGaitResult.Gait{}).Count(&cnt)
 	if count.Error != nil {
 		panic("数据库获取步态结果个数失败")
 		return 0
@@ -30,7 +30,7 @@ func GaitCount() int64 {
 
 func GetFaceByLR(l, r int64) []modelGaitResult.Gait {
 	allGait := make([]modelGaitResult.Gait, 0)
-	query := config.DB.Model(&modelGaitResult.Gait{}).Offset(l - 1).Limit(r - l + 1).Find(&allGait)
+	query := global.DB.Model(&modelGaitResult.Gait{}).Offset(l - 1).Limit(r - l + 1).Find(&allGait)
 	if query.Error != nil {
 		panic("sql执行错误[分页查询步态识别结果失败]")
 	}
@@ -38,7 +38,7 @@ func GetFaceByLR(l, r int64) []modelGaitResult.Gait {
 }
 
 func CreateQuery() *gorm.DB {
-	return config.DB.Model(&modelGaitResult.Gait{})
+	return global.DB.Model(&modelGaitResult.Gait{})
 }
 
 func GetGaitByCameraId(db *gorm.DB, id string) *gorm.DB {
